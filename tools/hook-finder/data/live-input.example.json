@@ -1,0 +1,52 @@
+[
+  {
+    "_note": "Copy this file to live-input.json and edit the entries before running in live mode. The _note field is ignored by the tool. All scores are initial analyst estimates — Companies House and Gazette adapters will add to source_confidence_score where they find official data. Remove _note fields from live-input.json.",
+
+    "company_number": "00000000",
+    "company_name": "Example Furniture Ltd",
+    "trading_name": "Example Furniture",
+    "website": "examplefurniture.co.uk",
+    "company_status": "unknown",
+    "insolvency_type": "unknown",
+    "insolvency_date": null,
+    "primary_source_url": "https://www.thegazette.co.uk/notice/replace-with-real-notice-id",
+    "secondary_source_url": null,
+
+    "source_confidence_score": 2,
+    "sector": "furniture-retail",
+    "b2c_fit_score": 20,
+    "consumer_loss_score": 18,
+    "search_demand_score": 12,
+    "commercial_fit_score": 7,
+
+    "verified_facts": [],
+    "unverified_signals": [
+      "Company mentioned in trade press as having stopped taking new orders"
+    ],
+    "editorial_cautions": [
+      "No official insolvency notice found yet — do not publish until confirmed"
+    ],
+
+    "created_at": "2026-05-01T08:00:00Z",
+    "updated_at": "2026-05-01T08:00:00Z"
+  },
+
+  {
+    "_note": "Minimal entry — only the required fields. The tool will attempt enrichment from Companies House using the company_number. Scores not provided here will default to 0.",
+
+    "company_number": "11111111",
+    "trading_name": "Another Example Kitchens",
+    "sector": "kitchen-installation",
+    "primary_source_url": "https://www.thegazette.co.uk/notice/replace-with-real-notice-id",
+
+    "source_confidence_score": 0,
+    "b2c_fit_score": 0,
+    "consumer_loss_score": 0,
+    "search_demand_score": 0,
+    "commercial_fit_score": 0,
+
+    "verified_facts": [],
+    "unverified_signals": [],
+    "editorial_cautions": []
+  }
+]

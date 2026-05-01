@@ -1,0 +1,23 @@
+{
+  "_note": "Example Gazette notice fixture. Use this schema when manually curating data from a Gazette notice for use with sources/gazette.js ingestFromFixture(). This file is not read automatically — pass the parsed object to ingestFromFixture() explicitly. All fields should be copied verbatim from the official Gazette notice. Do not estimate or guess any field.",
+
+  "notice_id": "mock-example-1",
+  "notice_url": "https://www.thegazette.co.uk/notice/mock-example-1",
+  "notice_type": "Appointment of Administrator",
+  "notice_date": "2026-04-25",
+
+  "company_name": "Home Furnishing Direct Ltd",
+  "company_number": "09876543",
+  "insolvency_type": "administration",
+
+  "practitioners": [
+    {
+      "name": "Jane Smith",
+      "role": "administrator",
+      "firm": "Smith & Associates Insolvency Practitioners",
+      "appointed_on": "2026-04-25"
+    }
+  ],
+
+  "notice_text_excerpt": "Notice is hereby given that Jane Smith of Smith & Associates was appointed as administrator of Home Furnishing Direct Ltd (Company Number 09876543) on 25 April 2026."
+}

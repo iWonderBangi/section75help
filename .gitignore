@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Hook Finder generated output (internal tool — never published)
+tools/hook-finder/output/
+# Live candidate input file (may contain real company data — never commit)
+tools/hook-finder/data/live-input.json

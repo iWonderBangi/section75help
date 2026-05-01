@@ -1,0 +1,45 @@
+name: Hook Finder
+
+# Runs daily at 07:00 UTC (07:00 GMT in winter / 08:00 BST in summer).
+# Also triggerable manually via workflow_dispatch.
+#
+# Output: a Markdown report uploaded as a workflow artifact for human review.
+# This workflow does NOT publish pages, create issues, or modify the public site.
+# All output requires human review before any action is taken.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
+
+jobs:
+  run:
+    name: Run Hook Finder
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Hook Finder (CI mode)
+        run: npm run hook-finder:ci
+        env:
+          COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hook-finder-report-${{ github.run_id }}
+          path: tools/hook-finder/output/
+          retention-days: 30
