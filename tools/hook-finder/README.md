@@ -46,6 +46,72 @@ Output is written to `tools/hook-finder/output/` (git-ignored):
 - `report-YYYY-MM-DD-live.md` — live mode report
 - `brief-[company-slug].md` — one brief per `needs_review` candidate
 
+## GitHub Actions workflow
+
+The workflow at `.github/workflows/hook-finder.yml` runs the hook-finder automatically
+and uploads the report as a downloadable artifact. It does not publish pages, create issues,
+send notifications, or modify the public site in any way.
+
+### Schedule
+
+Runs daily at **07:00 UTC** (07:00 GMT in winter / 08:00 BST in summer).
+
+### Triggering manually
+
+1. Go to the repository on GitHub.
+2. Click **Actions** in the top navigation bar.
+3. Select **Hook Finder** from the left-hand workflow list.
+4. Click **Run workflow** → **Run workflow**.
+
+The run will appear in the list within a few seconds.
+
+### Finding the report artifact
+
+1. Open the completed workflow run.
+2. Scroll to the **Artifacts** section at the bottom of the run summary.
+3. Download `hook-finder-report-<run-id>`.
+
+The artifact contains:
+- `report-YYYY-MM-DD-live.md` — the scored candidate report
+- `brief-[company-slug].md` — one brief per candidate that reached `needs_review` (if any)
+
+Artifacts are retained for **30 days** and then deleted automatically.
+
+### Configuring the Companies House API key
+
+If `COMPANIES_HOUSE_API_KEY` is not set, the workflow continues safely — Companies House
+enrichment is skipped and a warning is logged per candidate. Reports are still generated.
+
+To enable full enrichment:
+
+1. Get a free key at https://developer.company-information.service.gov.uk/
+2. In GitHub: **Settings → Secrets and variables → Actions → New repository secret**
+3. Name: `COMPANIES_HOUSE_API_KEY`
+4. Value: your key
+5. Save. The next workflow run will pick it up automatically.
+
+Never commit the key to the repository.
+
+### What input data does the CI workflow use?
+
+The `hook-finder:ci` script runs against `tools/hook-finder/data/live-input.example.json`,
+which is committed to the repository. This file contains placeholder candidates and is safe
+to use in CI — it will not produce real enrichment results, but it validates that the full
+pipeline (validation, dedup, enrichment, scoring, report generation) runs without error.
+
+To monitor real candidates in CI, replace the contents of `live-input.example.json` with
+actual company data and commit that file. Unlike `live-input.json` (which is git-ignored),
+`live-input.example.json` is tracked, so any changes will be picked up by the next run.
+
+### Safety notes
+
+- **Artifact reports are for human review only.** No page should be created without
+  independent verification of all facts against official primary sources.
+- **Workflow failure does not affect the public website.** The hook-finder is a separate
+  internal tool. A failing run produces no side-effects outside its own output directory.
+- **No credentials are stored in the workflow file.** The API key is read from a GitHub
+  Actions secret at runtime and is never echoed to logs.
+
 ## Using a real Companies House API key
 
 Live mode calls the Companies House public API. You need a free API key.
