@@ -89,6 +89,106 @@ In rough order of SEO value:
 
 Each trigger and category page follows the same template: failure scenario → why Section 75 applies → specific evidence to gather → claim letter pointer → expected timeline → FOS escalation note.
 
+## The Content Funnel
+
+This is the core commercial engine of the site. Every piece of content exists to serve this three-layer funnel:
+
+**Layer 1 — Hook:** A trigger page published within 48 hours of a UK business failure, ranking for "[company name] refund" and "[company name] administration" searches before any competitor.
+
+**Layer 2 — Value:** The page, the master guide, the eligibility checker, and the category pages collectively answer every question a confused consumer has. They leave knowing exactly what to do. This trust is the entire conversion mechanism.
+
+**Layer 3 — Convert:** The £6.99 claim pack removes the final friction — writing the actual letter. Every page on the site points toward it at the moment of maximum motivation (when the user understands their situation and knows they have a valid claim).
+
+### Trigger page brief
+
+When given a company name and failure details, produce a complete trigger page MDX file at `src/content/trigger/[company-slug].mdx` that does ALL of the following:
+
+**Opening (first 150 words):**
+
+- Opens with the specific financial loss the customer is facing. Use a real number if known ("You paid a £3,000 deposit for a kitchen that will never be installed") or a realistic range if not.
+- Names the company and the date of administration or closure.
+- States immediately and clearly that Section 75 of the Consumer Credit Act 1974 may entitle them to a full refund from their credit card provider.
+- No preamble. No "In this article we will explore." The user is stressed and looking for a lifeline — give it to them in the first sentence.
+
+**Body sections (in this order):**
+
+1. **What happened** — factual summary of the business failure, administrator name if known, what customers are owed.
+2. **Does Section 75 apply here?** — walk through the specific criteria as they apply to THIS company's customers. Address the most common edge cases: deposit only, part payment on card, purchased through a third party, bought as a gift.
+3. **What evidence to gather** — a specific checklist for this type of purchase (not a generic list — tailored to whether it's a kitchen, holiday, furniture, wedding venue, etc.).
+4. **How to make the claim** — link to the master guide for the full process, summarise the three key steps here.
+5. **What your bank will say** — the two or three most likely rejection reasons for this specific type of claim, and the exact rebuttal for each.
+6. **If your bank refuses** — one paragraph on FOS escalation, link to the FOS escalation guide.
+7. **The claim pack CTA** — one honest, low-pressure paragraph explaining that the £6.99 claim pack includes a pre-written letter with the correct legal citations, a follow-up letter, and a rejection rebuttal. Link to /claim-pack/. No exclamation marks. No "get your refund today." Just: here is the tool, here is what it contains, here is the price.
+
+**Tone and style throughout:**
+
+- British English, no em-dashes.
+- Honest about timelines (banks take 4–8 weeks, FOS backlogs are real).
+- Sceptical of banks without being inflammatory.
+- Empowering but never promising outcomes.
+- Cite legislation.gov.uk for Section 75 references.
+- Cite the FOS decisions database if referencing similar upheld cases.
+
+**Frontmatter:**
+
+```
+title: "[Company Name] administration: how to claim your refund via Section 75"
+description: "[Company Name] has gone into administration. If you paid by credit card, Section 75 of the Consumer Credit Act may entitle you to a full refund. Here is exactly how to claim."
+publishedAt: [today's date]
+updatedAt: [today's date]
+category: trigger
+disclaimer: true
+company: [company name]
+failureDate: [date of administration]
+```
+
+**Internal links (mandatory):**
+
+- At least two links to the master guide (/guide/)
+- One link to the eligibility checker (/)
+- One link to the claim pack (/claim-pack/)
+- One link to the FOS escalation guide (/guide/financial-ombudsman/) if it exists
+
+**Definition of done for a trigger page:**
+
+1. Opens with the specific loss scenario, not a generic intro.
+2. Addresses the company's specific product/service type throughout — not generic Section 75 copy.
+3. Zero TODOs or placeholders — complete content only.
+4. All internal links present.
+5. Claim pack CTA present, honest, low-pressure.
+6. Frontmatter complete.
+7. Disclaimer block included.
+8. British English throughout, no em-dashes.
+9. No outcome promises.
+10. No content that implies we handle claims on behalf of the user.
+
+### Trigger page one-shot prompt
+
+When a new UK business failure is identified, use this prompt structure:
+
+> "[Company name] has gone into administration as of [date]. They were a [type of business — kitchen installer / travel operator / furniture retailer / wedding venue etc.]. Customers are reporting losses of approximately [£X range] typically. The administrator is [name if known]. Write a complete trigger page following the trigger page brief in CLAUDE.md."
+
+### Category page brief
+
+Category pages follow the same funnel logic but target evergreen searches rather than breaking news. They rank more slowly but generate steady baseline traffic indefinitely.
+
+Target searches: "Section 75 wedding deposit," "Section 75 kitchen installation," "Section 75 holiday booking," "Section 75 car deposit."
+
+Structure mirrors the trigger page but opens with the category failure scenario ("Your wedding venue has cancelled and is refusing to refund your £8,000 deposit") rather than a named company. Include three to four real-world example scenarios within the page. Link to any relevant trigger pages for specific companies in that category.
+
+### The weekly content rhythm
+
+- **Monday:** Check Insolvency Service notices and the Gazette for new consumer-facing failures. Write any trigger pages needed.
+- **Wednesday:** Check Google Search Console for pages gaining impressions but not clicks — improve their title tags and meta descriptions.
+- **Friday:** Draft the newsletter (one trigger event summary, one consumer rights tip, one claim pack mention).
+
+### Conversion optimisation rules
+
+- Every page links to the claim pack at the point of maximum user motivation — after they understand their situation, not before.
+- The eligibility checker on the homepage is the primary lead capture mechanism. Users who complete it and get a "likely eligible" result are the highest-intent visitors on the site.
+- Never add pop-ups, countdown timers, or artificial scarcity. The audience is sceptical UK consumers who will leave immediately if they smell a sales tactic.
+- The claim pack CTA must always include what is in the pack (the specific letters), the price (£6.99), and nothing else. No testimonials until real ones exist. No "money back guarantee" unless you actually offer one via Stripe.
+
 ## Monetisation
 
 - **Primary:** £6.99 claim pack (Stripe/Gumroad). This is the £1/day floor.
