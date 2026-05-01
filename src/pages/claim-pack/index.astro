@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Section 75 Claim Pack"
-  description="A £6.99 download including a template claim letter, evidence checklist, and step-by-step guide for making a Section 75 claim against your credit card provider."
+  description="A £6.99 download including template claim letters, evidence checklists, rejection rebuttals, and a Financial Ombudsman complaint letter for Section 75 claims."
   disclaimer={true}
 >
   <article class="prose prose-gray max-w-none">
@@ -15,21 +15,52 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       Banks reject a significant proportion of valid Section 75 claims at first attempt, often because the claimant has not framed their case correctly or has left out key information. This pack gives you the tools to make a well-structured claim from the start, and to respond effectively if the bank pushes back.
     </p>
 
+    <!-- Who it is for / not for -->
+    <div class="not-prose my-6 grid sm:grid-cols-2 gap-4">
+      <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-gray-700">
+        <p class="font-semibold text-gray-800 mb-3">Who this pack is for</p>
+        <p class="text-gray-600 mb-2">This pack is for you if:</p>
+        <ul class="space-y-1.5 list-disc list-inside marker:text-green-500">
+          <li>you paid at least part of a purchase on a personal credit card;</li>
+          <li>the total price was more than £100 and no more than £30,000;</li>
+          <li>the retailer has failed to deliver, gone bust, refused a refund, or supplied faulty or not-as-described goods;</li>
+          <li>you want to write the claim yourself instead of using a claims company.</li>
+        </ul>
+      </div>
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+        <p class="font-semibold text-gray-800 mb-3">Who this pack is not for</p>
+        <p class="text-gray-600 mb-2">This pack may not be suitable if:</p>
+        <ul class="space-y-1.5 list-disc list-inside marker:text-gray-400">
+          <li>you paid by debit card only;</li>
+          <li>the purchase was under £100;</li>
+          <li>the purchase was made on a company credit card;</li>
+          <li>you want someone to handle the claim for you;</li>
+          <li>your case is already in court or involves a very large or complex dispute.</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="not-prose my-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
       <p class="font-semibold text-gray-800 mb-2">What this product is — and is not</p>
       <p class="mb-1">We are not a claims management company. We do not handle claims, contact banks, negotiate with card providers, or represent customers. We provide general information and downloadable template documents only.</p>
       <p>This website provides general information and templates. It is not legal advice. <a href="/disclaimer/" class="underline hover:text-gray-800">Full disclaimer</a></p>
     </div>
 
-    <h2>What is included</h2>
+    <h2>What's inside the PDF</h2>
 
-    <ul>
-      <li><strong>Template claim letter</strong> for standard Section 75 disputes (non-delivery, faulty goods, not as described).</li>
-      <li><strong>Template claim letter</strong> for administration and insolvency cases, where the retailer has ceased trading.</li>
-      <li><strong>Evidence checklist</strong> setting out what to gather before writing to your bank, and what to attach to your letter.</li>
-      <li><strong>Step-by-step submission guide</strong> covering how to address your claim, what the bank is required to do, and what their response should look like.</li>
-      <li><strong>FOS escalation template</strong> for use if the bank rejects your claim or does not respond within eight weeks.</li>
-    </ul>
+    <p>The pack is a single PDF containing nine documents. Each one opens with a short note explaining when to use it. Placeholder text — the fields you need to fill in — is highlighted throughout so you cannot miss them.</p>
+
+    <ol>
+      <li><strong>Cover sheet and decision guide</strong> — a one-page reference showing which documents to use and in what order, depending on your situation.</li>
+      <li><strong>Initial claim letter</strong> — a formal letter to your credit card provider's disputes team, citing Section 75(1) of the Consumer Credit Act 1974. Covers non-delivery, faulty goods, goods not as described, and business failure.</li>
+      <li><strong>Evidence cover letter</strong> — a structured letter to accompany the documents you send to your bank, with a table for itemising each piece of evidence.</li>
+      <li><strong>Plain English process guide</strong> — a reference page covering the claim timeline, what the bank is required to do under FCA rules, and when and how to escalate.</li>
+      <li><strong>Rejection rebuttal — standard</strong> — a response to the most common rejection grounds: insufficient evidence, purchase not covered, no explanation given.</li>
+      <li><strong>Rejection rebuttal — overseas purchase</strong> — for cases where the bank says Section 75 does not apply because the supplier was based abroad. Cites <em>OFT v Lloyds TSB Bank plc</em> [2007] UKHL 48.</li>
+      <li><strong>Rejection rebuttal — part payment on card</strong> — for cases where the bank claims its liability is capped at the amount charged to the card, rather than the full contract value.</li>
+      <li><strong>Rejection rebuttal — third party or booking agent</strong> — for cases where the bank says Section 75 does not apply because you paid an intermediary rather than the ultimate supplier.</li>
+      <li><strong>Financial Ombudsman Service complaint letter</strong> — a formal complaint to the FOS for use if the bank issues a final rejection or does not respond within eight weeks.</li>
+    </ol>
 
     <h2>What it costs and how to get it</h2>
 
@@ -38,7 +69,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </p>
 
     <p>
-      Payment is handled by Stripe. After payment, you will receive an email with a download link for a PDF containing all the templates and guides.
+      Payment is handled securely by Stripe. After payment you are taken immediately to a download page where you can save the PDF. Stripe will also send a payment receipt to the email address you used at checkout.
     </p>
 
     <div class="not-prose my-6">
@@ -52,6 +83,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         By completing checkout you confirm you want immediate access to the download and understand that your 14-day cancellation right ends once the download begins.
       </p>
     </div>
+
+    <h2>What happens after payment</h2>
+
+    <ol>
+      <li>Pay securely through the Stripe checkout.</li>
+      <li>After payment you are taken to a download page. Save the PDF somewhere easy to find — you may need it over the coming weeks.</li>
+      <li>Open the PDF and read the cover sheet (Document 1) to find the right letter for your situation.</li>
+      <li>Fill in the highlighted placeholders in your chosen letter with your own details.</li>
+      <li>Send the completed letter and supporting evidence to your card provider's disputes team.</li>
+    </ol>
 
     <h2>Is this legal advice?</h2>
 
