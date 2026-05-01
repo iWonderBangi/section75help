@@ -12,6 +12,7 @@ const { title, description, disclaimer, updatedAt } = masterGuide.data;
 
 <BaseLayout {title} {description} {disclaimer}>
   <article class="prose prose-gray max-w-none">
+    <h1>{title}</h1>
     <Content />
   </article>
   <p class="mt-8 text-xs text-gray-400">

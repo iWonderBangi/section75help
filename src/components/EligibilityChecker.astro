@@ -118,7 +118,10 @@
 
   </div>
 
-  <button id="restart-btn" class="hidden mt-4 text-sm text-gray-500 underline hover:text-gray-700">Start again</button>
+  <div class="flex gap-4 mt-4">
+    <button id="back-btn" class="hidden text-sm text-gray-500 underline hover:text-gray-700">← Back</button>
+    <button id="restart-btn" class="hidden text-sm text-gray-500 underline hover:text-gray-700">Start again</button>
+  </div>
 </div>
 
 <style>
@@ -136,9 +139,11 @@
 <script>
   const stepsContainer = document.getElementById('steps')!;
   const restartBtn = document.getElementById('restart-btn')!;
+  const backBtn = document.getElementById('back-btn')!;
   const dots = document.querySelectorAll('[data-step-dot]');
 
   let currentStep = '1';
+  let history: string[] = [];
 
   function showStep(key: string) {
     stepsContainer.querySelectorAll('[data-step]').forEach(el => {
@@ -151,13 +156,17 @@
     const stepNum = parseInt(key);
     dots.forEach(dot => {
       const n = parseInt((dot as HTMLElement).dataset.stepDot!);
-      dot.className = `h-2 flex-1 rounded-full ${n <= stepNum && !key.startsWith('out') ? 'bg-[#1e3a5f]' : (key.startsWith('out') && stepNum >= 1 ? 'bg-[#1e3a5f]' : 'bg-gray-200')}`;
+      dot.className = `h-2 flex-1 rounded-full ${n <= stepNum && !key.startsWith('out') ? 'bg-[#1e3a5f]' : (key.startsWith('out') ? 'bg-[#1e3a5f]' : 'bg-gray-200')}`;
     });
 
     if (key.startsWith('out')) {
       dots.forEach(dot => dot.className = 'h-2 flex-1 rounded-full bg-[#1e3a5f]');
       restartBtn.classList.remove('hidden');
+    } else {
+      restartBtn.classList.add('hidden');
     }
+
+    backBtn.classList.toggle('hidden', history.length === 0);
 
     currentStep = key;
   }
@@ -165,11 +174,17 @@
   stepsContainer.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-next]') as HTMLElement | null;
     if (!btn) return;
-    const next = btn.dataset.next!;
-    showStep(next);
+    history.push(currentStep);
+    showStep(btn.dataset.next!);
+  });
+
+  backBtn.addEventListener('click', () => {
+    const prev = history.pop();
+    if (prev) showStep(prev);
   });
 
   restartBtn.addEventListener('click', () => {
+    history = [];
     restartBtn.classList.add('hidden');
     stepsContainer.querySelectorAll('.checker-checkbox').forEach(cb => {
       (cb as HTMLInputElement).checked = false;
