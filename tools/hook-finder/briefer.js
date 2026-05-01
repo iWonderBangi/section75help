@@ -113,11 +113,11 @@ function getSectorQueries(sector, tradingName) {
   return queries.map((q) => q.replace(/\[company name\]/gi, tradingName));
 }
 
-function getSectorEvidence(sector) {
+export function getSectorEvidence(sector) {
   return SECTOR_EVIDENCE[sector] ?? SECTOR_EVIDENCE.default;
 }
 
-function getSectorRejections(sector) {
+export function getSectorRejections(sector) {
   return SECTOR_BANK_REJECTIONS[sector] ?? SECTOR_BANK_REJECTIONS.default;
 }
 

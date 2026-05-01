@@ -5,7 +5,7 @@
 Hook Finder is a local prototype for identifying UK B2C company distress events that may warrant
 a future Section 75 hook page on section75help.co.uk.
 
-It does four things:
+It does five things:
 
 1. **Validates** live input candidates, clamping scores, flagging ambiguous identifiers, and
    dropping candidates that are missing required fields.
@@ -15,6 +15,9 @@ It does four things:
    or `rejected`, with a full source breakdown per candidate.
 4. **Generates a page brief** for any candidate that reaches `needs_review` status. The brief
    is a planning document only — it does not create or publish a page.
+5. **Generates an internal MDX page draft** for `needs_review` candidates, on request. The draft
+   is saved to `output/page-drafts/` and must be reviewed, fact-checked, and all placeholders
+   resolved before it is moved anywhere near the public site.
 
 ## What this tool does not do
 
@@ -38,6 +41,15 @@ node tools/hook-finder/run.js --input path/to/input.json
 
 # Run the test checks (no API key required)
 npm run hook-finder:test
+
+# Generate an internal page draft for a specific needs_review brief
+npm run hook-finder:draft -- --brief tools/hook-finder/output/brief-<slug>.md
+
+# Generate drafts for all needs_review candidates in summary.json
+npm run hook-finder:draft
+
+# Preview the GitHub Issue body without creating an issue
+npm run hook-finder:issue-dry-run
 ```
 
 Output is written to `tools/hook-finder/output/` (git-ignored):
@@ -322,17 +334,81 @@ tools/hook-finder/
     live-input.json                Your actual live candidates (git-ignored)
     fixtures/
       gazette-notice.example.json  Gazette fixture schema for ingestFromFixture()
-  output/                          Generated reports and briefs (git-ignored)
+  output/                          Generated reports, briefs, and drafts (git-ignored)
+    page-drafts/                   Internal MDX page drafts — never publish directly
   sources/
     companies-house.js             Companies House API client
     gazette.js                     Gazette adapter (fixture + URL)
     index.js                       Adapter registry and merger
-  briefer.js                       Page brief generator
+  briefer.js                       Page brief generator (exports getSectorEvidence, getSectorRejections)
+  create-issue.js                  GitHub Issue delivery (Phase 4)
+  create-page-draft.js             Internal page draft generator (Phase 5A)
   dedup.js                         Duplicate detection
   reporter.js                      Daily Markdown report generator
-  run.js                           CLI entry point
+  run.js                           CLI entry point (writes summary.json alongside report)
   scorer.js                        Scoring and classification logic
   test.js                          Adapter-level test checks
   validate.js                      Input validation
   README.md                        This file
 ```
+
+## Page draft workflow (Phase 5A)
+
+The page draft generator turns a `needs_review` brief into an internal MDX scaffold for
+human editorial work. It does not publish anything.
+
+### Step-by-step
+
+1. Run the hook-finder to generate `output/summary.json` and `output/brief-<slug>.md`:
+
+   ```
+   npm run hook-finder          # mock mode, or
+   npm run hook-finder:ci       # CI mode with example file
+   ```
+
+2. Review the brief file and confirm the candidate is genuinely ready to draft.
+
+3. Generate the internal draft:
+
+   ```
+   npm run hook-finder:draft -- --brief tools/hook-finder/output/brief-sofa-bed-warehouse.md
+   ```
+
+   Or generate drafts for all `needs_review` candidates at once:
+
+   ```
+   npm run hook-finder:draft
+   ```
+
+4. Open `tools/hook-finder/output/page-drafts/draft-<slug>.mdx`.
+
+5. Resolve every `[EDITOR: ...]` placeholder with verified information.
+
+6. Work through the pre-publish checklist in the file header comment.
+
+7. Only when all placeholders are resolved and all facts independently verified:
+   move the file to `src/content/trigger/<slug>.mdx`, remove the internal frontmatter
+   fields (`draft`, `internalOnly`, `publishAllowed`, `status`, `generatedAt`,
+   `sourceBrief`, `lastFactCheck`), and set `publishedAt` and `updatedAt`.
+
+### What the draft contains
+
+- Frontmatter split into internal metadata fields (removed before publish) and public
+  page metadata fields (retained and completed before publish).
+- An internal header comment with a pre-publish checklist.
+- A disclaimer block at the top and foot of the page.
+- All mandatory page sections following the CLAUDE.md trigger-page structure.
+- `[EDITOR: ...]` markers wherever a fact needs verification or editorial judgement.
+- Verified facts from the candidate's `verified_facts` and `api_confirmed_facts` arrays.
+- Unverified signals marked clearly as requiring verification before use.
+- Sector-appropriate evidence checklist and bank rejection rebuttals.
+- All mandatory internal links pre-wired (`/guide/`, `/`, `/claim-pack/`,
+  `/guide/financial-ombudsman/`).
+
+### What the draft does NOT do
+
+- It does not publish a page or create any public route.
+- It does not fabricate facts. Anything unknown is an `[EDITOR: ...]` placeholder.
+- It does not generate drafts for `monitoring`, `rejected`, or `ambiguous_company`
+  candidates — those exit with a clear error.
+- It does not move files automatically. A human must move the draft to `src/content/`.
