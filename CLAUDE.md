@@ -28,6 +28,11 @@ They are sceptical of anything that looks like a scam or a CMC. Tone must be pla
 - **Honest framing.** If banks routinely reject valid claims at first attempt, say so. If FOS escalation takes months, say so. Empowering but realistic.
 - **Prices in GBP, real ones.** No "around £X" hedging when actual figures are knowable.
 
+## Domain
+
+- **Production domain:** section75help.co.uk
+- **Repository:** https://github.com/iWonderBangi/section75help
+
 ## Tech stack
 
 - **Hosting:** Cloudflare Pages (free tier).
