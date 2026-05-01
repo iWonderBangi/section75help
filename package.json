@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "hook-finder": "node tools/hook-finder/run.js"
+    "hook-finder": "node tools/hook-finder/run.js",
+    "hook-finder:live": "node tools/hook-finder/run.js --live"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.4",

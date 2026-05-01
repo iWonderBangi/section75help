@@ -16,7 +16,8 @@
       "Bash(git fetch *)",
       "Bash(node scripts/generate-pdf.js)",
       "Bash(node scripts/generate-pdf.cjs)",
-      "Bash(node tools/hook-finder/run.js)"
+      "Bash(node tools/hook-finder/run.js)",
+      "Bash(node tools/hook-finder/run.js --input tools/hook-finder/data/live-input.example.json)"
     ]
   }
 }
