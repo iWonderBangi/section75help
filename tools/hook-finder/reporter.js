@@ -1,19 +1,19 @@
 // Generates a daily Markdown report from scored candidates.
 // Output is for internal human review only — never published directly.
-
-function statusBadge(status) {
-  const map = { needs_review: "NEEDS REVIEW", monitoring: "MONITORING", rejected: "REJECTED" };
-  return map[status] ?? status.toUpperCase();
-}
+//
+// Mock mode: three-section layout (verified facts, unverified signals, editorial cautions).
+//            Same as Phase 1 — no change to existing mock output.
+//
+// Live mode: five-section layout per candidate:
+//   1. API-confirmed facts     — data returned directly from Companies House or Gazette API
+//   2. Manually supplied facts — data in the input file or Gazette fixture (human-curated)
+//   3. Unverified signals      — signals from non-official sources (press, reviews, filings)
+//   4. Editorial cautions      — blockers the editor must resolve before drafting
+//   5. Still needed            — computed list of what is currently unknown
 
 function riskBadge(risk_level) {
   const map = { low: "Low", medium: "Medium", high: "High" };
   return map[risk_level] ?? risk_level;
-}
-
-function scoreBar(score, max) {
-  const filled = Math.round((score / max) * 10);
-  return `${"█".repeat(filled)}${"░".repeat(10 - filled)} ${score}/${max}`;
 }
 
 function renderList(items, emptyText) {
@@ -21,7 +21,121 @@ function renderList(items, emptyText) {
   return items.map((item) => `- ${item}`).join("\n");
 }
 
-function formatCandidate(c, index) {
+// Compute what is still unknown and required before a page can be drafted.
+// Runs against the candidate's current state after enrichment.
+function computeStillNeeded(c) {
+  const needed = [];
+  if (!c.company_number) {
+    needed.push("Company number (required to verify identity at Companies House)");
+  }
+  if (!c.primary_source_url) {
+    needed.push("Official insolvency notice URL (Gazette, Companies House, or Insolvency Service)");
+  }
+  if (!c.insolvency_type || c.insolvency_type === "unknown") {
+    needed.push("Insolvency type confirmed from an official notice (e.g. administration, liquidation)");
+  }
+  if (!c.insolvency_date) {
+    needed.push("Insolvency or appointment date from an official notice");
+  }
+  const hasAnyConfirmedFact =
+    (c.api_confirmed_facts?.length ?? 0) > 0 ||
+    (c.verified_facts?.length ?? 0) > 0;
+  if (!hasAnyConfirmedFact) {
+    needed.push(
+      "At least one fact confirmed by an official source (Companies House API or Gazette notice)"
+    );
+  }
+  return needed;
+}
+
+function formatCandidateLive(c, index) {
+  const breakdown = c._score_breakdown;
+  const sourceLink = c.primary_source_url
+    ? `[Primary source](${c.primary_source_url})`
+    : "No primary source found";
+  const secondaryLink = c.secondary_source_url
+    ? ` | [Secondary source](${c.secondary_source_url})`
+    : "";
+
+  const ambiguousFlag = c.ambiguous_company
+    ? "**AMBIGUOUS** — company identity is uncertain"
+    : "—";
+
+  const apiConfirmed = renderList(
+    c.api_confirmed_facts,
+    "*None — Companies House enrichment did not run or returned no data.*"
+  );
+  const manualFacts = renderList(
+    c.verified_facts,
+    "*None recorded in the input file.*"
+  );
+  const unverifiedSignals = renderList(
+    c.unverified_signals,
+    "*None.*"
+  );
+  const editorialCautions = renderList(
+    c.editorial_cautions,
+    "*None.*"
+  );
+  const stillNeeded = renderList(
+    computeStillNeeded(c),
+    "*Nothing outstanding — proceed to brief if score permits.*"
+  );
+
+  return `### ${index + 1}. ${c.trading_name ?? c.company_name}
+
+| Field | Value |
+|---|---|
+| Legal name | ${c.company_name ?? "—"} |
+| Company number | ${c.company_number ?? "Not provided"} |
+| Website | ${c.website ?? "—"} |
+| Sector | ${c.sector} |
+| Status | ${c.company_status ?? "unknown"} |
+| Insolvency type | ${c.insolvency_type ?? "unknown"} |
+| Insolvency date | ${c.insolvency_date ?? "Not confirmed"} |
+| Risk level | ${riskBadge(c.risk_level)} |
+| Ambiguous company | ${ambiguousFlag} |
+| **Total score** | **${c.total_score} / 100** |
+
+**Score breakdown:**
+
+| Dimension | Score | Max |
+|---|---|---|
+| B2C fit | ${breakdown.b2c} | 25 |
+| Consumer loss likelihood | ${breakdown.loss} | 25 |
+| Search demand | ${breakdown.demand} | 20 |
+| Source confidence | ${breakdown.confidence} | 20 |
+| Commercial fit | ${breakdown.commercial} | 10 |
+
+**Sources:** ${sourceLink}${secondaryLink}
+
+**1. API-confirmed facts** *(returned directly by Companies House API or Gazette API — treat as verified):*
+
+${apiConfirmed}
+
+**2. Manually supplied facts** *(from input file or Gazette fixture — human-curated, check against original notice):*
+
+${manualFacts}
+
+**3. Unverified signals** *(do not present these as facts in any published page):*
+
+${unverifiedSignals}
+
+**4. Editorial cautions** *(must be resolved before drafting):*
+
+${editorialCautions}
+
+**5. Still needed before drafting:**
+
+${stillNeeded}
+
+**Recommended action:** ${recommendedAction(c)}
+
+---
+`;
+}
+
+function formatCandidateMock(c, index) {
   const breakdown = c._score_breakdown;
   const sourceLink = c.primary_source_url
     ? `[Primary source](${c.primary_source_url})`
@@ -34,14 +148,8 @@ function formatCandidate(c, index) {
     c.verified_facts,
     "*None recorded — treat all signals as unverified.*"
   );
-  const unverifiedSignals = renderList(
-    c.unverified_signals,
-    "*None.*"
-  );
-  const editorialCautions = renderList(
-    c.editorial_cautions,
-    "*None.*"
-  );
+  const unverifiedSignals = renderList(c.unverified_signals, "*None.*");
+  const editorialCautions = renderList(c.editorial_cautions, "*None.*");
 
   return `### ${index + 1}. ${c.trading_name ?? c.company_name}
 
@@ -105,6 +213,9 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
   const monitoring = scoredCandidates.filter((c) => c.status === "monitoring");
   const rejected = scoredCandidates.filter((c) => c.status === "rejected");
 
+  const formatFn =
+    mode === "live" ? formatCandidateLive : formatCandidateMock;
+
   const lines = [];
 
   lines.push(`# Hook Page Discovery Report — ${date}`);
@@ -113,6 +224,23 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
   lines.push("> verification of all facts against official sources (the Gazette, Companies House,");
   lines.push("> Insolvency Service). This report is a recommendation engine, not a publishing queue.");
   lines.push("");
+
+  if (mode === "live") {
+    lines.push(
+      "> **Live mode.** Candidates were enriched via the Companies House API and Gazette adapter."
+    );
+    lines.push(
+      "> API-confirmed facts (section 1) came directly from official APIs."
+    );
+    lines.push(
+      "> Manually supplied facts (section 2) came from the input file or a Gazette fixture."
+    );
+    lines.push(
+      "> Unverified signals (section 3) must not be stated as facts in any published page."
+    );
+    lines.push("");
+  }
+
   lines.push("## Summary");
   lines.push("");
   lines.push(`| Status | Count |`);
@@ -132,7 +260,7 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
       "These candidates scored 80+ and have sufficient source confidence for a hook page brief to be drafted. A human editor must verify all facts before any page is written."
     );
     lines.push("");
-    needs.forEach((c, i) => lines.push(formatCandidate(c, i)));
+    needs.forEach((c, i) => lines.push(formatFn(c, i)));
   }
 
   if (monitoring.length > 0) {
@@ -142,7 +270,7 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
       "These candidates have signals worth watching but do not yet meet the threshold for a hook page brief — either the score is too low, source confidence is insufficient, or the consumer impact is unclear."
     );
     lines.push("");
-    monitoring.forEach((c, i) => lines.push(formatCandidate(c, i)));
+    monitoring.forEach((c, i) => lines.push(formatFn(c, i)));
   }
 
   if (rejected.length > 0) {
@@ -152,7 +280,7 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
       "These candidates scored below 60. No Section 75 hook page is warranted. Archive if no change in 30 days."
     );
     lines.push("");
-    rejected.forEach((c, i) => lines.push(formatCandidate(c, i)));
+    rejected.forEach((c, i) => lines.push(formatFn(c, i)));
   }
 
   lines.push("---");
@@ -161,7 +289,7 @@ export function generateReport(scoredCandidates, date, mode = "mock") {
     mode === "live"
       ? "live mode — candidates enriched via Companies House API and Gazette adapter."
       : "mock mode — using static mock candidates, no API calls made.";
-  lines.push(`*Generated by tools/hook-finder — Phase 2A, ${modeNote}*`);
+  lines.push(`*Generated by tools/hook-finder — Phase 2B, ${modeNote}*`);
   lines.push(
     "*Scoring: B2C fit (25) + Consumer loss (25) + Search demand (20) + Source confidence (20) + Commercial fit (10) = 100 max.*"
   );

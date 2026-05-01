@@ -23,6 +23,8 @@ import { scoreCandidates } from "./scorer.js";
 import { generateReport } from "./reporter.js";
 import { generateBrief } from "./briefer.js";
 import { enrichCandidates } from "./sources/index.js";
+import { validateCandidates } from "./validate.js";
+import { detectDuplicates } from "./dedup.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "output");
@@ -104,6 +106,28 @@ async function run() {
     const inputLabel = options.inputFile ?? "data/live-input.json";
     console.log(`Candidates : ${rawCandidates.length} (from ${inputLabel})`);
     console.log("");
+
+    console.log("Validating...");
+    rawCandidates = validateCandidates(rawCandidates);
+    if (rawCandidates.length === 0) {
+      console.error("No valid candidates remain after validation. Exiting.");
+      process.exit(1);
+    }
+    console.log(`  ${rawCandidates.length} candidate(s) passed validation.`);
+    console.log("");
+
+    console.log("Checking for duplicates...");
+    const { candidates: deduped, log: dedupLog } = detectDuplicates(rawCandidates);
+    if (dedupLog.length > 0) {
+      dedupLog.forEach(({ action, reason, name }) => {
+        console.log(`  [${action.toUpperCase()}] ${name}: ${reason}`);
+      });
+    } else {
+      console.log("  No duplicates found.");
+    }
+    rawCandidates = deduped;
+    console.log("");
+
     console.log("Enriching via source adapters...");
     rawCandidates = await enrichCandidates(rawCandidates);
     console.log("");

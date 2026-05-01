@@ -15,7 +15,7 @@
 // - 404 on the company endpoint means the number is wrong or unregistered — not insolvency.
 // - 404 on the insolvency endpoint means no insolvency record is filed yet.
 //   Absence of an insolvency record does not confirm the company is solvent.
-// - Only data returned directly from the API is placed in verified_facts.
+// - Only data returned directly from the API is placed in api_confirmed_facts.
 // - Do not infer insolvency from company_status alone without the insolvency endpoint confirming it.
 
 const BASE_URL = "https://api.company-information.service.gov.uk";
@@ -140,7 +140,7 @@ export async function enrichFromCompaniesHouse(candidate) {
     };
   }
 
-  const newVerifiedFacts = [
+  const newApiConfirmedFacts = [
     `Company name confirmed via Companies House API: ${company.company_name}`,
     `Company status via Companies House: ${company.company_status}`,
   ];
@@ -150,7 +150,7 @@ export async function enrichFromCompaniesHouse(candidate) {
     const addrStr = [addr.address_line_1, addr.locality, addr.postal_code]
       .filter(Boolean)
       .join(", ");
-    if (addrStr) newVerifiedFacts.push(`Registered address (Companies House): ${addrStr}`);
+    if (addrStr) newApiConfirmedFacts.push(`Registered address (Companies House): ${addrStr}`);
   }
 
   const updates = {
@@ -158,7 +158,7 @@ export async function enrichFromCompaniesHouse(candidate) {
     company_status: mapStatus(company.company_status),
     // Confirmed company record adds 6 to source_confidence_score (capped at 20 by index.js).
     _confidence_delta: 6,
-    verified_facts: newVerifiedFacts,
+    api_confirmed_facts: newApiConfirmedFacts,
     unverified_signals: [],
     editorial_cautions: [],
   };
@@ -193,7 +193,7 @@ export async function enrichFromCompaniesHouse(candidate) {
     const names = practitioners
       .map((p) => `${p.name}${p.role ? ` (${p.role})` : ""}`)
       .join("; ");
-    updates.verified_facts.push(
+    updates.api_confirmed_facts.push(
       `Insolvency practitioners from Companies House: ${names}`
     );
   }
@@ -205,7 +205,7 @@ export async function enrichFromCompaniesHouse(candidate) {
       a.appointed_on <= b.appointed_on ? a : b
     );
     updates.insolvency_date = earliest.appointed_on;
-    updates.verified_facts.push(
+    updates.api_confirmed_facts.push(
       `Insolvency appointment date from Companies House: ${earliest.appointed_on}`
     );
   }

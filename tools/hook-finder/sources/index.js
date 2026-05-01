@@ -20,7 +20,12 @@
 import { enrichFromCompaniesHouse } from "./companies-house.js";
 import { ingestFromUrl as gazetteFromUrl } from "./gazette.js";
 
-const ARRAY_FIELDS = ["verified_facts", "unverified_signals", "editorial_cautions"];
+const ARRAY_FIELDS = [
+  "verified_facts",
+  "api_confirmed_facts",
+  "unverified_signals",
+  "editorial_cautions",
+];
 const SCALAR_EMPTY = [null, undefined, "unknown", ""];
 
 function isEmptyScalar(value) {

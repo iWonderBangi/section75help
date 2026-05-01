@@ -5,36 +5,117 @@
 Hook Finder is a local prototype for identifying UK B2C company distress events that may warrant
 a future Section 75 hook page on section75help.co.uk.
 
-It does three things:
+It does four things:
 
-1. **Scores** a list of candidate companies against five dimensions (B2C fit, consumer loss
-   likelihood, search demand, source confidence, and commercial fit).
-2. **Generates a daily Markdown report** classifying candidates as `needs_review`, `monitoring`,
-   or `rejected`, with a score breakdown, source links, and a recommended action for each.
-3. **Generates a page brief** for any candidate that reaches `needs_review` status. The brief
-   outlines a suggested page title, target search queries, verified facts, safety wording, and
-   a recommended CTA. It is a planning document, not a draft page.
+1. **Validates** live input candidates, clamping scores, flagging ambiguous identifiers, and
+   dropping candidates that are missing required fields.
+2. **Scores** candidates against five dimensions (B2C fit, consumer loss likelihood, search demand,
+   source confidence, and commercial fit).
+3. **Generates a daily Markdown report** classifying candidates as `needs_review`, `monitoring`,
+   or `rejected`, with a full source breakdown per candidate.
+4. **Generates a page brief** for any candidate that reaches `needs_review` status. The brief
+   is a planning document only — it does not create or publish a page.
 
 ## What this tool does not do
 
 - It does not publish anything. No Astro page is created, no content goes live.
-- It does not connect to any external API, scrape any website, or fetch live data.
 - It does not verify company facts. All verification is a human responsibility.
 - It does not represent users to their banks or handle claims on their behalf.
 - It does not fabricate insolvency facts, customer numbers, or search demand figures.
+- It does not commit any data to the repository.
 
 ## How to run it
 
 ```
-node tools/hook-finder/run.js
+# Mock mode — uses static sample data, no API calls
+npm run hook-finder
+
+# Live mode — reads data/live-input.json, calls Companies House API and Gazette adapter
+npm run hook-finder:live
+
+# Live mode with a custom input file
+node tools/hook-finder/run.js --input path/to/input.json
+
+# Run the test checks (no API key required)
+npm run hook-finder:test
 ```
 
-Output is written to `tools/hook-finder/output/`:
+Output is written to `tools/hook-finder/output/` (git-ignored):
 
-- `report-YYYY-MM-DD.md` — the daily candidate report
+- `report-YYYY-MM-DD.md` — mock mode report
+- `report-YYYY-MM-DD-live.md` — live mode report
 - `brief-[company-slug].md` — one brief per `needs_review` candidate
 
-The `output/` directory is git-ignored. Generated files are for local review only.
+## Using a real Companies House API key
+
+Live mode calls the Companies House public API. You need a free API key.
+
+### 1. Get a key
+
+Register at https://developer.company-information.service.gov.uk/ and create an application.
+The free tier covers all usage required by this tool.
+
+### 2. Set the key in your shell — do not commit it
+
+**macOS / Linux (bash or zsh):**
+```bash
+export COMPANIES_HOUSE_API_KEY=your_key_here
+```
+Add this line to `~/.bashrc`, `~/.zshrc`, or a local `.env.local` file that is gitignored.
+Never add it to a file that gets committed.
+
+**Windows PowerShell:**
+```powershell
+$env:COMPANIES_HOUSE_API_KEY = "your_key_here"
+```
+To persist across sessions, add it to your PowerShell profile (`$PROFILE`) or set it as a
+user environment variable in System Properties. Never hard-code it in a script file.
+
+### 3. Verify it is set
+
+```bash
+echo $COMPANIES_HOUSE_API_KEY      # macOS / Linux
+echo $env:COMPANIES_HOUSE_API_KEY  # PowerShell
+```
+
+### 4. Run in live mode
+
+```
+npm run hook-finder:live
+```
+
+If the key is missing or incorrect, the tool will print a clear error message and continue
+without the Companies House data (warnings are collected per candidate, not crashes).
+
+### What the key is used for
+
+The tool calls two endpoints per candidate:
+- `GET /company/{company_number}` — confirms legal name, status, and address
+- `GET /company/{company_number}/insolvency` — confirms insolvency type, practitioners, and date
+
+No write operations are performed. Rate limits are generous for manual use.
+
+### Security
+
+- **Never commit the key.** `data/live-input.json` and `output/` are git-ignored.
+  The `.env` file is also git-ignored by the root `.gitignore`.
+- **Never hardcode the key** in `companies-house.js` or any other file.
+- If you suspect a key has been exposed, revoke it immediately in the Companies House
+  developer portal and generate a replacement.
+
+## Preparing a live-input.json file
+
+Copy the example and edit it:
+
+```
+cp tools/hook-finder/data/live-input.example.json tools/hook-finder/data/live-input.json
+```
+
+`live-input.json` is git-ignored. Fill in real candidate details. The file is a JSON array.
+Required fields per entry: `sector`, and at least one of `company_number`, `trading_name`,
+or `company_name`. All other fields are optional but improve scoring accuracy.
+
+See `data/live-input.example.json` for the full field list and annotations.
 
 ## How scoring works
 
@@ -57,10 +138,36 @@ Each candidate is scored on five dimensions. Scores are capped at their maximum 
 | 60–79 | `monitoring` | Check again in 48 hours. Not ready for a brief. |
 | Below 60 | `rejected` | No hook page warranted. Archive after 30 days with no change. |
 
-**The low-confidence override:** If `source_confidence_score` is below 10 (no official notice
-found), the candidate is capped at `monitoring` regardless of its total score. A high B2C fit
-score is not sufficient to justify publishing claims about a company without official insolvency
-evidence.
+**The low-confidence override:** If `source_confidence_score` is below 10, the candidate is
+capped at `monitoring` regardless of its total score. A high B2C fit score alone is not
+sufficient to justify publishing claims about a company without official insolvency evidence.
+
+**Live mode confidence deltas:** The Companies House adapter adds up to +14 to
+`source_confidence_score` (6 for a confirmed company record, 8 for a confirmed insolvency case).
+The Gazette URL adapter adds +3 for a confirmed URL. A Gazette fixture adds +10.
+
+## Validation and duplicate detection
+
+**Validation** runs before enrichment. Candidates are dropped if they are missing `sector` and
+all identifiers. Scores outside their legal range are clamped with a warning. Missing
+`company_number` or a generic company name triggers `ambiguous_company = true`.
+
+**Duplicate detection** runs after validation, before enrichment, to avoid redundant API calls:
+- Same `company_number` → the later entry is merged into the earlier one. Higher scores win.
+- Same `primary_source_url`, different numbers → both are kept, but the later entry is flagged.
+
+## Live-mode report sections
+
+Each candidate in a live-mode report has five sections:
+
+1. **API-confirmed facts** — data returned directly by the Companies House API. Treat as verified.
+2. **Manually supplied facts** — data from the input file or a Gazette fixture. Check against the
+   original notice before drafting.
+3. **Unverified signals** — signals from non-official sources (press, reviews, overdue filings).
+   Do not present these as facts in any published page.
+4. **Editorial cautions** — specific blockers the editor must resolve before drafting.
+5. **Still needed** — a computed list of what is currently unknown and required before a page
+   can be drafted.
 
 ## Why human review is required before publishing
 
@@ -69,38 +176,42 @@ Publishing inaccurate or unverified claims creates legal risk (defamation, misle
 reputational risk (the site's credibility depends on accuracy), and commercial risk (FCA scrutiny
 if we appear to be making false representations that prompt consumers to make unfounded claims).
 
-The hook finder is a recommendation engine. A human editor must:
+A human editor must, before any page is drafted:
 
-1. Confirm the insolvency notice against the Gazette or Companies House before any page is drafted.
-2. Verify the administrator's name and firm.
-3. Confirm the consumer impact (number of customers, typical loss amounts) from a named source.
-4. Check whether ATOL, ABTA, or other protection schemes apply (for travel companies).
+1. Confirm the insolvency notice against the Gazette or Companies House.
+2. Verify the administrator's name and firm from the official notice.
+3. Confirm the consumer impact from a named source — do not estimate.
+4. Check whether ATOL, ABTA, or other protection schemes apply (travel companies).
 5. Ensure the page does not promise a refund outcome or imply we act on the customer's behalf.
 
-## Phase 2 additions
+## Phase 2C additions
 
-Phase 1 uses mock data only. Phase 2 should add:
-
-- A live Gazette RSS feed parser to identify new insolvency notices daily.
-- A Companies House API integration to pull filing history and director details.
-- A search demand estimator (Google Trends, keyword tool API, or DataForSEO).
-- Automated daily scheduling (cron or GitHub Actions) to run the scorer and post a Slack
-  or email summary to the editorial team.
-- A simple web UI or CLI flag to approve a candidate and trigger brief generation without
-  editing the source file.
-- A completed candidates archive (JSON or SQLite) so the tool remembers which companies
-  have already been processed.
+- A live Gazette RSS feed parser to surface new notices automatically.
+- A search demand estimator (Google Trends or DataForSEO API).
+- A completed candidates archive (JSON or SQLite) so re-runs do not re-process known companies.
+- A simple review UI or CLI prompt to approve a candidate and trigger brief generation.
 
 ## File structure
 
 ```
 tools/hook-finder/
   data/
-    candidates.js       Mock candidate data (Phase 1)
-  output/               Generated reports and briefs (git-ignored)
-  briefer.js            Page brief generator
-  reporter.js           Daily Markdown report generator
-  run.js                CLI entry point
-  scorer.js             Scoring and classification logic
-  README.md             This file
+    candidates.js                  Mock candidate data (Phase 1, used in mock mode)
+    live-input.example.json        Template for live candidate input (commit this)
+    live-input.json                Your actual live candidates (git-ignored)
+    fixtures/
+      gazette-notice.example.json  Gazette fixture schema for ingestFromFixture()
+  output/                          Generated reports and briefs (git-ignored)
+  sources/
+    companies-house.js             Companies House API client
+    gazette.js                     Gazette adapter (fixture + URL)
+    index.js                       Adapter registry and merger
+  briefer.js                       Page brief generator
+  dedup.js                         Duplicate detection
+  reporter.js                      Daily Markdown report generator
+  run.js                           CLI entry point
+  scorer.js                        Scoring and classification logic
+  test.js                          Adapter-level test checks
+  validate.js                      Input validation
+  README.md                        This file
 ```
