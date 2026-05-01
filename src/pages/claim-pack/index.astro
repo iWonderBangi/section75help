@@ -49,7 +49,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <div class="not-prose my-6">
       <a
         href="https://buy.stripe.com/fZucN5cKu1Kf9VK0hwes000"
-        class="btn-primary"
+        class="btn-primary-lg"
       >
         Buy the claim pack — £6.99
       </a>
@@ -59,19 +59,30 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <h2>What's inside the PDF</h2>
 
-    <p>The pack is a single plain-English PDF workbook. It walks you through your claim from start to finish, with the letters and templates you need at each stage. It includes:</p>
+    <p>A single plain-English PDF workbook. It walks you through your claim from start to finish, with the letters and templates you need at each stage.</p>
 
-    <ol>
-      <li><strong>A simple start-here guide</strong> — explains what Section 75 is, how the process works, and what to expect from your bank.</li>
-      <li><strong>A 5-minute Section 75 checker</strong> — a short set of questions to confirm your purchase qualifies before you write to your bank.</li>
-      <li><strong>A one-page claim details worksheet</strong> — a structured form to pull together the key facts of your case before you start writing.</li>
-      <li><strong>An evidence checklist</strong> — tailored to the most common claim types, so you know exactly what to gather and send.</li>
-      <li><strong>An initial Section 75 claim letter</strong> — a formal letter to your credit card provider's disputes team, citing Section 75(1) of the Consumer Credit Act 1974. Covers non-delivery, faulty goods, goods not as described, and business failure.</li>
-      <li><strong>A short chase message</strong> — a follow-up template for use if your bank does not respond within the required timeframe.</li>
-      <li><strong>Rebuttal templates for common bank rejection reasons</strong> — ready-to-send responses covering the most frequent grounds banks use to reject valid claims, including overseas supplier arguments and part-payment disputes.</li>
-      <li><strong>A Financial Ombudsman complaint template</strong> — a formal complaint letter for use if the bank issues a final rejection or fails to respond within eight weeks.</li>
-      <li><strong>A plain-English glossary and official sources</strong> — definitions of the terms your bank will use, and links to the primary legislation and FOS guidance.</li>
-    </ol>
+  </article>
+
+  <div class="not-prose my-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {[
+      { title: 'Start-here guide',           desc: 'What Section 75 is and how to use this pack' },
+      { title: 'Section 75 checker',         desc: 'Confirm your purchase qualifies before you write' },
+      { title: 'Claim details worksheet',    desc: 'A form to capture the key facts of your case' },
+      { title: 'Evidence checklist',         desc: 'Know exactly what to gather and send' },
+      { title: 'Initial claim letter',       desc: 'Ready-to-send template citing the legislation' },
+      { title: 'Chase message',              desc: 'Follow up if the bank does not reply in time' },
+      { title: 'Rebuttal templates',         desc: 'Counter the most common bank rejection reasons' },
+      { title: 'FOS complaint letter',       desc: 'Use this if the bank refuses or goes silent' },
+      { title: 'Glossary and sources',       desc: 'Plain-English definitions and official links' },
+    ].map(({ title, desc }) => (
+      <div class="rounded border-l-4 bg-gray-50 px-4 py-3 text-sm" style="border-left-color: #1e3a5f;">
+        <p class="font-semibold text-gray-800 mb-0.5">{title}</p>
+        <p class="text-gray-500">{desc}</p>
+      </div>
+    ))}
+  </div>
+
+  <article class="prose prose-gray max-w-none">
 
     <h2>What it costs and how to get it</h2>
 
