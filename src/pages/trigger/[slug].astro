@@ -12,17 +12,23 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, disclaimer, companyName, administrationDate, updatedAt } = entry.data;
+const { title, description, disclaimer, noindex, companyName, administrationDate, updatedAt } = entry.data;
 ---
 
-<BaseLayout {title} {description} {disclaimer}>
-  <div class="mb-6 rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-    <strong>{companyName}</strong> went into administration
-    {administrationDate && (
-      <span> on {administrationDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-    )}.
-    This page explains how to make a Section 75 claim if you paid by credit card.
-  </div>
+<BaseLayout {title} {description} {disclaimer} {noindex}>
+  {noindex ? (
+    <div class="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <strong>Draft page.</strong> This page is not indexed and is not linked from the site navigation. It will be updated with verified details before publication.
+    </div>
+  ) : (
+    <div class="mb-6 rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+      <strong>{companyName}</strong> went into administration
+      {administrationDate && (
+        <span> on {administrationDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+      )}.
+      This page explains how to make a Section 75 claim if you paid by credit card.
+    </div>
+  )}
 
   <article class="prose prose-gray max-w-none">
     <Content />

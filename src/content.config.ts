@@ -20,6 +20,7 @@ const trigger = defineCollection({
   schema: baseSchema.extend({
     companyName: z.string(),
     administrationDate: z.coerce.date().optional(),
+    noindex: z.boolean().optional(),
   }),
 });
 
