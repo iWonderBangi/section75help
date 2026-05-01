@@ -24,38 +24,61 @@ const { title, description, disclaimer = false, noindex = false } = Astro.props;
   </head>
   <body class="bg-white text-gray-900 antialiased">
 
-    <header class="border-b border-gray-200">
+    <!-- ── Header ────────────────────────────────────────────────────────── -->
+    <header style="background-color: #1e3a5f;">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <a href="/" class="text-sm font-semibold text-gray-900 hover:text-gray-700">
-          Section 75 Claim Helper
+
+        <a href="/" class="font-semibold text-white hover:text-white/80 transition-colors leading-tight">
+          <span class="sm:hidden text-sm">Section 75</span>
+          <span class="hidden sm:inline text-sm">Section 75 Claim Helper</span>
         </a>
-        <nav>
-          <ul class="flex gap-5 text-sm text-gray-600">
-            <li><a href="/guide/" class="hover:text-gray-900">Guide</a></li>
-            <li><a href="/claim-pack/" class="hover:text-gray-900">Claim Pack</a></li>
-            <li><a href="/about/" class="hover:text-gray-900">About</a></li>
+
+        <nav aria-label="Primary">
+          <ul class="flex items-center gap-3 sm:gap-5">
+            <li class="hidden sm:block">
+              <a href="/guide/" class="text-sm text-white/80 hover:text-white transition-colors">
+                How It Works
+              </a>
+            </li>
+            <li>
+              <a href="/#checker" class="text-sm text-white/80 hover:text-white transition-colors">
+                Check Eligibility
+              </a>
+            </li>
+            <li>
+              <a
+                href="/claim-pack/"
+                class="rounded bg-white px-3 py-1.5 text-xs sm:text-sm font-semibold transition-colors hover:bg-gray-100 whitespace-nowrap"
+                style="color: #1e3a5f;"
+              >
+                Claim Pack — £6.99
+              </a>
+            </li>
           </ul>
         </nav>
+
       </div>
     </header>
 
+    <!-- ── Main content ───────────────────────────────────────────────────── -->
     <main class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       {disclaimer && (
-        <div class="mb-8 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <strong>Important:</strong> The information on this page is general information only and does not constitute legal advice for your specific circumstances. Every claim depends on its individual facts. If you are unsure about your position, consult a solicitor.
+        <div class="mb-8 rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <strong>General information only.</strong> This page does not constitute legal advice for your specific circumstances. Every Section 75 claim depends on its individual facts. If you are unsure about your position, consult a qualified solicitor.
         </div>
       )}
       <slot />
     </main>
 
+    <!-- ── Footer ────────────────────────────────────────────────────────── -->
     <footer class="mt-16 border-t border-gray-200">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 text-sm text-gray-500">
         <p>
           Section 75 Claim Helper is an information service, not a claims management company.
           We do not handle claims on your behalf or represent you to your bank.
-          <a href="/disclaimer/" class="underline hover:text-gray-700">Full disclaimer and affiliate disclosure.</a>
+          <a href="/disclaimer/" class="underline hover:text-gray-700">Full disclaimer.</a>
         </p>
-        <p class="mt-3 flex gap-4">
+        <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
           <a href="/about/" class="hover:text-gray-700">About</a>
           <a href="/disclaimer/" class="hover:text-gray-700">Disclaimer</a>
           <a href="/privacy/" class="hover:text-gray-700">Privacy</a>

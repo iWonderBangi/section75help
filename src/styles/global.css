@@ -1,6 +1,47 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ── Brand tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --navy:       #1e3a5f;
+  --navy-hover: #162d49;
+  --link:       #2563eb;
+  --link-hover: #1d4ed8;
+}
+
+/* ── Primary button components ────────────────────────────────────────────── */
+@layer components {
+  /* Standard button */
+  .btn-primary {
+    @apply inline-block rounded px-6 py-3 text-sm font-semibold text-white transition-colors;
+    background-color: var(--navy);
+  }
+  .btn-primary:hover { background-color: var(--navy-hover); }
+
+  /* Large button — claim-pack buy CTA */
+  .btn-primary-lg {
+    @apply inline-block rounded px-8 py-4 text-base font-bold text-white transition-colors;
+    background-color: var(--navy);
+  }
+  .btn-primary-lg:hover { background-color: var(--navy-hover); }
+
+  /* Full-width block button — eligibility checker result CTA */
+  .btn-primary-full {
+    @apply block w-full text-center rounded py-4 text-base font-bold text-white transition-colors;
+    background-color: var(--navy);
+  }
+  .btn-primary-full:hover { background-color: var(--navy-hover); }
+}
+
+/* ── Prose overrides ──────────────────────────────────────────────────────── */
+
+/* Blue links in article content (trust signal for a legal/financial site) */
+.prose :where(a) {
+  color: var(--link);
+  text-decoration-color: #bfdbfe;
+}
+.prose :where(a):hover { color: var(--link-hover); }
+
 /* Horizontally scrollable tables on narrow screens */
 .prose :where(table) {
   display: block;

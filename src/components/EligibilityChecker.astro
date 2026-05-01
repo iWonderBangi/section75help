@@ -10,7 +10,7 @@
   <!-- Step indicators -->
   <div id="step-indicators" class="flex gap-2 mb-6" aria-hidden="true">
     {[1,2,3,4,5].map(n => (
-      <div data-step-dot={n} class={`h-2 flex-1 rounded-full ${n === 1 ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+      <div data-step-dot={n} class={`h-2 flex-1 rounded-full ${n === 1 ? 'bg-[#1e3a5f]' : 'bg-gray-200'}`}></div>
     ))}
   </div>
 
@@ -50,10 +50,11 @@
     </div>
 
     <div data-step="4" class="hidden">
-      <p class="font-medium text-gray-900 mb-4">When did you make the purchase?</p>
+      <p class="font-medium text-gray-900 mb-1">When did you make the purchase?</p>
+      <p class="text-sm text-gray-500 mb-4">The time limit is 6 years in England and Wales, or 5 years in Scotland, from when the problem arose.</p>
       <div class="flex flex-col gap-2">
-        <button data-next="5" data-value="within6" class="checker-btn">Within the last 6 years (England/Wales) or 5 years (Scotland)</button>
-        <button data-next="out-timelimit" data-value="over6" class="checker-btn">More than 6 years ago (England/Wales) or 5 years (Scotland)</button>
+        <button data-next="5" data-value="within6" class="checker-btn">Yes — within the last 6 years</button>
+        <button data-next="out-timelimit" data-value="over6" class="checker-btn">No — more than 6 years ago</button>
         <button data-next="5" data-value="unsure" class="checker-btn">Not sure of the exact date</button>
       </div>
     </div>
@@ -74,7 +75,7 @@
         <p class="text-sm text-green-800">Your purchase meets the basic conditions: paid at least partly by credit card, between £100 and £30,000, and within the time limits. You can make a claim directly to your credit card provider. Our claim pack includes a template letter and a step-by-step guide to give your claim the best chance of success.</p>
         <p class="text-sm text-green-700 mt-2">This checker is only a guide. Your bank will still assess your claim based on the facts and evidence.</p>
       </div>
-      <a href="/claim-pack/" class="inline-block rounded bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700">Get the claim pack for £6.99</a>
+      <a href="/claim-pack/" class="btn-primary-full">Get the claim pack — £6.99</a>
       <p class="mt-3 text-sm text-gray-500">Or <a href="/guide/" class="underline">read the full guide first</a>.</p>
     </div>
 
@@ -126,8 +127,10 @@
     @apply w-full rounded border border-gray-300 bg-white px-4 py-2.5 text-left text-sm text-gray-800 hover:border-gray-400 hover:bg-gray-50 transition-colors;
   }
   .checker-btn-primary {
-    @apply rounded bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700 transition-colors;
+    @apply rounded px-5 py-2.5 text-sm font-medium text-white transition-colors;
+    background-color: #1e3a5f;
   }
+  .checker-btn-primary:hover { background-color: #162d49; }
 </style>
 
 <script>
@@ -148,11 +151,11 @@
     const stepNum = parseInt(key);
     dots.forEach(dot => {
       const n = parseInt((dot as HTMLElement).dataset.stepDot!);
-      dot.className = `h-2 flex-1 rounded-full ${n <= stepNum && !key.startsWith('out') ? 'bg-gray-900' : (key.startsWith('out') && stepNum >= 1 ? 'bg-gray-900' : 'bg-gray-200')}`;
+      dot.className = `h-2 flex-1 rounded-full ${n <= stepNum && !key.startsWith('out') ? 'bg-[#1e3a5f]' : (key.startsWith('out') && stepNum >= 1 ? 'bg-[#1e3a5f]' : 'bg-gray-200')}`;
     });
 
     if (key.startsWith('out')) {
-      dots.forEach(dot => dot.className = 'h-2 flex-1 rounded-full bg-gray-900');
+      dots.forEach(dot => dot.className = 'h-2 flex-1 rounded-full bg-[#1e3a5f]');
       restartBtn.classList.remove('hidden');
     }
 
