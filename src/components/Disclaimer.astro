@@ -1,0 +1,24 @@
+---
+interface Props {
+  affiliate?: boolean;
+}
+
+const { affiliate = false } = Astro.props;
+---
+
+<div class="rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+  <p>
+    <strong>Disclaimer:</strong> The information on this page is general information only and does not
+    constitute legal advice for your specific situation. Section 75 claims depend on your individual
+    circumstances. This site does not handle claims on your behalf or represent you to your bank.
+    For advice on your specific case, consult a solicitor.
+  </p>
+  {affiliate && (
+    <p class="mt-2">
+      <strong>Affiliate disclosure:</strong> Some links on this page are affiliate links. If you apply
+      for a product via one of these links, we may earn a commission at no extra cost to you. This does
+      not influence which products we recommend. We recommend products on the basis of their suitability
+      for Section 75 claims, not commission rates.
+    </p>
+  )}
+</div>

@@ -1,0 +1,174 @@
+---
+// Eligibility checker island. Runs entirely client-side; no backend needed.
+// Five-step decision tree per CLAUDE.md logic.
+---
+
+<div id="checker" class="rounded-lg border border-gray-200 bg-gray-50 p-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-1">Check your eligibility</h2>
+  <p class="text-sm text-gray-600 mb-6">Answer five quick questions to find out whether you have a Section 75 claim.</p>
+
+  <!-- Step indicators -->
+  <div id="step-indicators" class="flex gap-2 mb-6" aria-hidden="true">
+    {[1,2,3,4,5].map(n => (
+      <div data-step-dot={n} class={`h-2 flex-1 rounded-full ${n === 1 ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+    ))}
+  </div>
+
+  <!-- Steps -->
+  <div id="steps">
+
+    <div data-step="1">
+      <p class="font-medium text-gray-900 mb-4">Did you pay at least £1 of the purchase on a credit card?</p>
+      <div class="flex flex-col gap-2">
+        <button data-next="2" data-value="yes" class="checker-btn">Yes</button>
+        <button data-next="out-debit" data-value="no" class="checker-btn">No (I paid by debit card, cash or bank transfer)</button>
+        <button data-next="2" data-value="notsure" class="checker-btn">Not sure</button>
+      </div>
+    </div>
+
+    <div data-step="2" class="hidden">
+      <p class="font-medium text-gray-900 mb-4">What was the total purchase price?</p>
+      <div class="flex flex-col gap-2">
+        <button data-next="3" data-value="qualifying" class="checker-btn">Between £100 and £30,000</button>
+        <button data-next="out-under100" data-value="under100" class="checker-btn">Under £100</button>
+        <button data-next="out-over30k" data-value="over30k" class="checker-btn">Over £30,000</button>
+      </div>
+    </div>
+
+    <div data-step="3" class="hidden">
+      <p class="font-medium text-gray-900 mb-3">What went wrong? (Select all that apply)</p>
+      <div class="flex flex-col gap-2 mb-4">
+        {['Non-delivery (goods or services never arrived)', 'Faulty or not as described', 'Business closed or went into administration', 'Fraud or misrepresentation', 'Other'].map(option => (
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" value={option} class="mt-0.5 checker-checkbox" />
+            <span class="text-sm text-gray-800">{option}</span>
+          </label>
+        ))}
+      </div>
+      <button data-next="4" class="checker-btn-primary">Continue</button>
+    </div>
+
+    <div data-step="4" class="hidden">
+      <p class="font-medium text-gray-900 mb-4">When did you make the purchase?</p>
+      <div class="flex flex-col gap-2">
+        <button data-next="5" data-value="within6" class="checker-btn">Within the last 6 years (England/Wales) or 5 years (Scotland)</button>
+        <button data-next="out-timelimit" data-value="over6" class="checker-btn">More than 6 years ago (England/Wales) or 5 years (Scotland)</button>
+        <button data-next="5" data-value="unsure" class="checker-btn">Not sure of the exact date</button>
+      </div>
+    </div>
+
+    <div data-step="5" class="hidden">
+      <p class="font-medium text-gray-900 mb-4">Was this a personal purchase or a business purchase?</p>
+      <div class="flex flex-col gap-2">
+        <button data-next="out-eligible" data-value="personal" class="checker-btn">Personal purchase</button>
+        <button data-next="out-eligible" data-value="soletrader" class="checker-btn">Business purchase on my personal credit card (sole trader)</button>
+        <button data-next="out-business" data-value="limitedco" class="checker-btn">Business purchase on a company or corporate card</button>
+      </div>
+    </div>
+
+    <!-- Outcomes -->
+    <div data-step="out-eligible" class="hidden">
+      <div class="rounded bg-green-50 border border-green-200 px-4 py-4 mb-4">
+        <p class="font-semibold text-green-900 mb-1">You are likely eligible for a Section 75 claim.</p>
+        <p class="text-sm text-green-800">Your purchase meets the basic conditions: paid at least partly by credit card, between £100 and £30,000, and within the time limits. You can make a claim directly to your credit card provider. Our claim pack includes a template letter and a step-by-step guide to give your claim the best chance of success.</p>
+      </div>
+      <a href="/claim-pack/" class="inline-block rounded bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700">Get the claim pack for £6.99</a>
+      <p class="mt-3 text-sm text-gray-500">Or <a href="/guide/" class="underline">read the full guide first</a>.</p>
+    </div>
+
+    <div data-step="out-debit" class="hidden">
+      <div class="rounded bg-blue-50 border border-blue-200 px-4 py-4">
+        <p class="font-semibold text-blue-900 mb-1">Section 75 does not apply, but chargeback might.</p>
+        <p class="text-sm text-blue-800">Section 75 only applies to credit card purchases. If you paid by debit card, you may be able to request a chargeback through your bank instead. Chargeback has shorter time limits and fewer legal protections, but it is often your best option in this situation.</p>
+      </div>
+      <p class="mt-3 text-sm"><a href="/guide/section-75-vs-chargeback/" class="underline text-gray-700">Read our guide to Section 75 vs chargeback.</a></p>
+    </div>
+
+    <div data-step="out-under100" class="hidden">
+      <div class="rounded bg-blue-50 border border-blue-200 px-4 py-4">
+        <p class="font-semibold text-blue-900 mb-1">The purchase price is below the Section 75 threshold.</p>
+        <p class="text-sm text-blue-800">Section 75 only applies to purchases with a total price of £100 or more. For purchases under £100, chargeback through your bank is the route to try. Chargeback is not a legal right in the same way, but most UK banks process them routinely for qualifying disputes.</p>
+      </div>
+      <p class="mt-3 text-sm"><a href="/guide/section-75-vs-chargeback/" class="underline text-gray-700">Read our guide to Section 75 vs chargeback.</a></p>
+    </div>
+
+    <div data-step="out-over30k" class="hidden">
+      <div class="rounded bg-amber-50 border border-amber-200 px-4 py-4">
+        <p class="font-semibold text-amber-900 mb-1">Section 75 does not cover purchases over £30,000.</p>
+        <p class="text-sm text-amber-800">Section 75 applies to agreements where the cash price is between £100 and £30,000. For larger purchases, Section 75A of the Consumer Credit Act may provide some protection in limited circumstances, but this is a narrower right. You may also want to speak to a solicitor about your options.</p>
+      </div>
+    </div>
+
+    <div data-step="out-timelimit" class="hidden">
+      <div class="rounded bg-amber-50 border border-amber-200 px-4 py-4">
+        <p class="font-semibold text-amber-900 mb-1">Your claim may be time-barred.</p>
+        <p class="text-sm text-amber-800">The limitation period for a Section 75 claim is six years from the date the cause of action arose in England and Wales, and five years in Scotland. If your purchase is older than this, your claim is likely out of time. It is still worth making contact with your bank, as they may exercise discretion, but you should be aware of the limitation issue. Consider taking legal advice.</p>
+      </div>
+    </div>
+
+    <div data-step="out-business" class="hidden">
+      <div class="rounded bg-blue-50 border border-blue-200 px-4 py-4">
+        <p class="font-semibold text-blue-900 mb-1">Section 75 does not cover business credit card purchases.</p>
+        <p class="text-sm text-blue-800">Section 75 applies to regulated consumer credit agreements. Purchases made on a corporate or business credit card (issued to a limited company) generally fall outside the Consumer Credit Act. If you used a personal credit card for a sole-trader business purchase, the position is different and you may still have a claim.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <button id="restart-btn" class="hidden mt-4 text-sm text-gray-500 underline hover:text-gray-700">Start again</button>
+</div>
+
+<style>
+  @reference "tailwindcss";
+  .checker-btn {
+    @apply w-full rounded border border-gray-300 bg-white px-4 py-2.5 text-left text-sm text-gray-800 hover:border-gray-400 hover:bg-gray-50 transition-colors;
+  }
+  .checker-btn-primary {
+    @apply rounded bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700 transition-colors;
+  }
+</style>
+
+<script>
+  const stepsContainer = document.getElementById('steps')!;
+  const restartBtn = document.getElementById('restart-btn')!;
+  const dots = document.querySelectorAll('[data-step-dot]');
+
+  let currentStep = '1';
+
+  function showStep(key: string) {
+    stepsContainer.querySelectorAll('[data-step]').forEach(el => {
+      (el as HTMLElement).classList.add('hidden');
+    });
+    const target = stepsContainer.querySelector(`[data-step="${key}"]`);
+    if (target) target.classList.remove('hidden');
+
+    // Update dots
+    const stepNum = parseInt(key);
+    dots.forEach(dot => {
+      const n = parseInt((dot as HTMLElement).dataset.stepDot!);
+      dot.className = `h-2 flex-1 rounded-full ${n <= stepNum && !key.startsWith('out') ? 'bg-gray-900' : (key.startsWith('out') && stepNum >= 1 ? 'bg-gray-900' : 'bg-gray-200')}`;
+    });
+
+    if (key.startsWith('out')) {
+      dots.forEach(dot => dot.className = 'h-2 flex-1 rounded-full bg-gray-900');
+      restartBtn.classList.remove('hidden');
+    }
+
+    currentStep = key;
+  }
+
+  stepsContainer.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-next]') as HTMLElement | null;
+    if (!btn) return;
+    const next = btn.dataset.next!;
+    showStep(next);
+  });
+
+  restartBtn.addEventListener('click', () => {
+    restartBtn.classList.add('hidden');
+    stepsContainer.querySelectorAll('.checker-checkbox').forEach(cb => {
+      (cb as HTMLInputElement).checked = false;
+    });
+    showStep('1');
+  });
+</script>

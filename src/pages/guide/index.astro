@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const guides = await getCollection('guide');
+const masterGuide = guides.find(e => e.id === 'section-75-complete-guide');
+if (!masterGuide) throw new Error('Master guide content entry not found');
+
+const { Content } = await render(masterGuide);
+const { title, description, disclaimer, updatedAt } = masterGuide.data;
+---
+
+<BaseLayout {title} {description} {disclaimer}>
+  <article class="prose prose-gray max-w-none">
+    <Content />
+  </article>
+  <p class="mt-8 text-xs text-gray-400">
+    Last updated: {updatedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+  </p>
+</BaseLayout>

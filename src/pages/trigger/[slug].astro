@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const triggers = await getCollection('trigger');
+  return triggers.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, disclaimer, companyName, administrationDate, updatedAt } = entry.data;
+---
+
+<BaseLayout {title} {description} {disclaimer}>
+  <div class="mb-6 rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+    <strong>{companyName}</strong> went into administration
+    {administrationDate && (
+      <span> on {administrationDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+    )}.
+    This page explains how to make a Section 75 claim if you paid by credit card.
+  </div>
+
+  <article class="prose prose-gray max-w-none">
+    <Content />
+  </article>
+
+  <div class="mt-10 rounded-lg border border-gray-200 bg-gray-50 px-6 py-5">
+    <h2 class="text-base font-semibold text-gray-900 mb-2">Ready to claim?</h2>
+    <p class="text-sm text-gray-700 mb-4">
+      Our claim pack includes a template letter written specifically for administration cases, an evidence checklist, and a step-by-step guide to submitting your claim.
+    </p>
+    <a href="/claim-pack/" class="inline-block rounded bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+      Get the claim pack for £6.99
+    </a>
+  </div>
+
+  <p class="mt-6 text-xs text-gray-400">
+    Last updated: {updatedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+  </p>
+</BaseLayout>

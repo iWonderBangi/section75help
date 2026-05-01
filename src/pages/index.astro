@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EligibilityChecker from '../components/EligibilityChecker.astro';
+---
+
+<BaseLayout
+  title="Section 75 Claim Helper"
+  description="Find out whether you have a valid Section 75 claim against your credit card provider, and what to do next. Free eligibility checker, full guide, and a £6.99 claim pack."
+>
+  <div class="space-y-12">
+
+    <section>
+      <h1 class="text-2xl font-bold text-gray-900 mb-3">
+        Section 75: Get your money back from your credit card provider
+      </h1>
+      <p class="text-gray-700 leading-relaxed mb-3">
+        If a retailer has gone bust, refused a refund, or delivered something seriously wrong, you may be able to claim your money back from your credit card provider, not just the retailer. Section 75 of the Consumer Credit Act 1974 makes them jointly liable for purchases between £100 and £30,000, even if you only paid £1 of the price on the card.
+      </p>
+      <p class="text-gray-700 leading-relaxed">
+        Most UK consumers either don't know about this right or don't use it correctly. This site gives you the tools to do it properly.
+      </p>
+    </section>
+
+    <section>
+      <EligibilityChecker />
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Start here</h2>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <a href="/guide/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 transition-colors">
+          <h3 class="font-medium text-gray-900 mb-1">Complete guide</h3>
+          <p class="text-sm text-gray-600">How Section 75 works, who qualifies, and how to claim step by step.</p>
+        </a>
+        <a href="/guide/section-75-vs-chargeback/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 transition-colors">
+          <h3 class="font-medium text-gray-900 mb-1">Section 75 vs chargeback</h3>
+          <p class="text-sm text-gray-600">Which route applies to your situation, and how to tell the difference.</p>
+        </a>
+        <a href="/claim-pack/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 transition-colors">
+          <h3 class="font-medium text-gray-900 mb-1">Claim pack (£6.99)</h3>
+          <p class="text-sm text-gray-600">Template letter, evidence checklist, and step-by-step submission guide.</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-gray-900 mb-2">Recent business failures</h2>
+      <p class="text-sm text-gray-600 mb-4">If a company you dealt with has recently gone into administration, we publish a Section 75 guide within 48 hours.</p>
+      <ul class="space-y-2 text-sm">
+        <li>
+          <a href="/trigger/hargreaves-interiors-administration/" class="text-gray-900 underline hover:text-gray-600">
+            Hargreaves Interiors Ltd (administration, April 2026)
+          </a>
+          <span class="text-gray-500"> — furniture deposits, Section 75 applies</span>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+</BaseLayout>

@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guide');
+  return guides
+    .filter(entry => entry.id !== 'section-75-complete-guide')
+    .map(entry => ({
+      params: { slug: entry.id },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, disclaimer, updatedAt } = entry.data;
+---
+
+<BaseLayout {title} {description} {disclaimer}>
+  <article class="prose prose-gray max-w-none">
+    <Content />
+  </article>
+  <p class="mt-8 text-xs text-gray-400">
+    Last updated: {updatedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+  </p>
+</BaseLayout>
