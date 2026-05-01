@@ -17,5 +17,8 @@
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.2.1",
     "tailwindcss": "^4.2.4"
+  },
+  "devDependencies": {
+    "pdfkit": "^0.18.0"
   }
 }

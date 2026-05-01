@@ -1,0 +1,206 @@
+/* Shared print styles — section75help.co.uk claim pack templates */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --body-font: Georgia, 'Times New Roman', serif;
+  --ui-font: Arial, Helvetica, sans-serif;
+  --body-size: 11pt;
+  --small-size: 9pt;
+  --line-height: 1.65;
+  --text: #111111;
+  --muted: #555555;
+  --rule: #cccccc;
+  --highlight-bg: #f7f7f7;
+  --placeholder-color: #000000;
+  --max-w: 680px;
+  --margin: 2cm;
+}
+
+body {
+  font-family: var(--body-font);
+  font-size: var(--body-size);
+  line-height: var(--line-height);
+  color: var(--text);
+  background: #fff;
+  max-width: var(--max-w);
+  margin: 1.5rem auto;
+  padding: 1.5rem 2rem;
+}
+
+/* ── Header ── */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1.5px solid var(--rule);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-family: var(--ui-font);
+}
+.doc-header .doc-title {
+  font-size: 10pt;
+  font-weight: bold;
+  color: #222;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.doc-header .site {
+  font-size: 9pt;
+  color: var(--muted);
+}
+
+/* ── Use-when notice ── */
+.use-when {
+  background: var(--highlight-bg);
+  border-left: 3px solid #999;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1.2rem;
+  font-family: var(--ui-font);
+  font-size: 9pt;
+}
+.use-when strong {
+  display: block;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+/* ── Typography ── */
+h1 { font-family: var(--ui-font); font-size: 14pt; margin-bottom: 0.4rem; }
+h2 { font-family: var(--ui-font); font-size: 11.5pt; margin-top: 1.2rem; margin-bottom: 0.3rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.15rem; }
+h3 { font-family: var(--ui-font); font-size: 10.5pt; margin-top: 0.9rem; margin-bottom: 0.2rem; }
+p { margin-bottom: 0.75rem; }
+ul, ol { margin: 0.5rem 0 0.75rem 1.4rem; }
+li { margin-bottom: 0.3rem; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 1rem 0; }
+
+/* ── Address block ── */
+.address-block {
+  font-family: var(--body-font);
+  font-size: var(--body-size);
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+/* ── Letter heading ── */
+.letter-heading {
+  font-family: var(--ui-font);
+  font-weight: bold;
+  font-size: 11.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 1rem 0 0.8rem;
+  text-decoration: underline;
+}
+
+/* ── Reference line ── */
+.ref-line {
+  font-family: var(--ui-font);
+  font-size: var(--small-size);
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+}
+
+/* ── Placeholders ── */
+strong.ph {
+  font-weight: bold;
+  color: var(--placeholder-color);
+  font-family: var(--ui-font);
+}
+
+/* ── Option block (choose one) ── */
+.option-block {
+  border: 1px solid var(--rule);
+  padding: 0.6rem 0.8rem;
+  margin: 0.5rem 0;
+  background: var(--highlight-bg);
+}
+.option-block .option-label {
+  font-family: var(--ui-font);
+  font-size: 8.5pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+.delete-note {
+  font-family: var(--ui-font);
+  font-size: 8.5pt;
+  color: #888;
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Checklist ── */
+.checklist { list-style: none; margin-left: 0; }
+.checklist li::before { content: "☐ "; font-size: 11pt; }
+
+/* ── Decision table ── */
+table.decision {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-family: var(--ui-font);
+  font-size: 9.5pt;
+}
+table.decision th {
+  background: #eee;
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  font-weight: bold;
+  border: 1px solid var(--rule);
+}
+table.decision td {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--rule);
+  vertical-align: top;
+}
+table.decision tr:nth-child(even) td { background: var(--highlight-bg); }
+
+/* ── Sign-off ── */
+.sign-off {
+  margin-top: 1.5rem;
+}
+.signature-line {
+  border-bottom: 1px solid #999;
+  width: 200px;
+  height: 1.5rem;
+  margin: 1.5rem 0 0.2rem;
+}
+
+/* ── Footer ── */
+.doc-footer {
+  font-family: var(--ui-font);
+  font-size: 7.5pt;
+  color: #888;
+  text-align: center;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.5rem;
+  margin-top: 2rem;
+}
+
+/* ══════════════════════════════════════
+   PRINT STYLES
+   ══════════════════════════════════════ */
+@media print {
+  @page { size: A4; margin: var(--margin); }
+
+  body { max-width: none; margin: 0; padding: 0; }
+
+  .doc-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 0.3rem 0;
+  }
+
+  h2, h3 { page-break-after: avoid; }
+  .option-block, .address-block { page-break-inside: avoid; }
+
+  a { text-decoration: none; color: inherit; }
+}
