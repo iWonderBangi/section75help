@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Hook Finder generated output (internal tool — never published)
+tools/hook-finder/output/
