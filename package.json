@@ -13,6 +13,7 @@
     "hook-finder": "node tools/hook-finder/run.js",
     "hook-finder:live": "node tools/hook-finder/run.js --live",
     "hook-finder:ci": "node tools/hook-finder/run.js --input tools/hook-finder/data/live-input.example.json",
+    "hook-finder:issue-dry-run": "node tools/hook-finder/create-issue.js --dry-run",
     "hook-finder:test": "node tools/hook-finder/test.js"
   },
   "dependencies": {

@@ -112,6 +112,61 @@ actual company data and commit that file. Unlike `live-input.json` (which is git
 - **No credentials are stored in the workflow file.** The API key is read from a GitHub
   Actions secret at runtime and is never echoed to logs.
 
+## GitHub Issue delivery
+
+When the workflow runs, it checks whether any candidates reached `needs_review` status.
+
+### When an issue IS created
+
+- One or more candidates scored 80+ with sufficient source confidence.
+- A GitHub Issue is opened titled `Hook Finder candidates needing review — YYYY-MM-DD`.
+- The issue body includes: summary counts, each needs_review candidate with its score
+  breakdown, risk level, source links, verified facts, unverified signals, editorial
+  cautions, recommended action, and a link to the workflow run artifact.
+- Labels applied: `hook-finder`, `needs-review`, `content-opportunity`.
+
+### When an issue is NOT created
+
+- No candidates reached `needs_review` status.
+- The workflow logs: "No needs_review candidates found. Artifact uploaded only."
+- The artifact is still uploaded regardless.
+
+### Duplicate prevention
+
+Before creating an issue, the script lists open issues labelled `hook-finder` and checks
+whether one with the same title already exists. If it does, no duplicate is created and
+the URL of the existing issue is logged.
+
+### Reviewing an issue
+
+1. Open the issue from the GitHub Issues tab.
+2. Read the editorial cautions and "still needed" items for each candidate.
+3. Independently verify all facts against the Gazette and Companies House before drafting.
+4. Download the workflow artifact for the full scored report and any generated page briefs.
+5. Close the issue once reviewed, whether or not a page is drafted.
+
+**A GitHub Issue does not mean a page should be published.** It means a human editor
+should review the evidence and decide. No page should be drafted until all facts have
+been independently verified against official primary sources.
+
+### Testing issue body generation locally (dry run)
+
+Run the hook-finder first to generate `output/summary.json`, then:
+
+```
+npm run hook-finder          # generates summary.json from mock data
+npm run hook-finder:issue-dry-run   # prints the issue title and body, no API calls
+```
+
+This lets you preview exactly what would be posted to GitHub without creating an issue.
+No `GITHUB_TOKEN` is required for dry-run mode.
+
+### No manual GitHub settings needed
+
+Issue creation uses the built-in `GITHUB_TOKEN` provided by GitHub Actions. No additional
+secrets are required. The token has `issues: write` permission, which is declared in the
+workflow file.
+
 ## Using a real Companies House API key
 
 Live mode calls the Companies House public API. You need a free API key.

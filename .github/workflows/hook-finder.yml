@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write
 
     steps:
       - name: Checkout
@@ -35,6 +36,7 @@ jobs:
         run: npm ci
 
       - name: Run Hook Finder (CI mode)
+        id: hook_finder
         run: npm run hook-finder:ci
         env:
           COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
@@ -46,3 +48,9 @@ jobs:
           name: hook-finder-report-${{ github.run_id }}
           path: tools/hook-finder/output/
           retention-days: 30
+
+      - name: Create GitHub Issue for needs_review candidates
+        if: steps.hook_finder.outcome == 'success'
+        run: node tools/hook-finder/create-issue.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

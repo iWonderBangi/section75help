@@ -163,6 +163,23 @@ async function run() {
   const report = generateReport(scored, today(), options.mode);
   writeFile(reportPath, report);
 
+  // summary.json is read by create-issue.js for GitHub Issue delivery.
+  const summaryPath = join(OUTPUT_DIR, "summary.json");
+  const summary = {
+    date: today(),
+    mode: options.mode,
+    counts: {
+      needs_review: needsReview.length,
+      monitoring: monitoring.length,
+      rejected: rejected.length,
+      total: scored.length,
+    },
+    needs_review: needsReview,
+    monitoring: monitoring,
+    rejected: rejected,
+  };
+  writeFile(summaryPath, JSON.stringify(summary, null, 2));
+
   if (needsReview.length === 0) {
     console.log("\nNo candidates reached needs_review — no briefs generated.");
   } else {
