@@ -7,10 +7,115 @@ const masterGuide = guides.find(e => e.id === 'section-75-complete-guide');
 if (!masterGuide) throw new Error('Master guide content entry not found');
 
 const { Content } = await render(masterGuide);
-const { title, description, disclaimer, updatedAt } = masterGuide.data;
+const { title, description, disclaimer, updatedAt, publishedAt } = masterGuide.data;
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does the full purchase price need to be on the credit card?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Section 75 applies as long as the total purchase price was more than £100 and no more than £30,000, and at least £1 was paid on your credit card. If you paid a £50 deposit on a £1,500 sofa using your credit card and the rest by bank transfer, Section 75 applies to the full £1,500."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Section 75 cover debit cards?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Section 75 applies only to regulated consumer credit agreements. Debit cards are not credit agreements. If you paid by debit card, the alternative is chargeback, which is processed under card scheme rules rather than statute and has a much shorter time limit."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Section 75 cover purchases made abroad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The House of Lords confirmed in Office of Fair Trading v Lloyds TSB Bank plc [2007] UKHL 48 that Section 75 applies to overseas transactions made on a UK credit card. If you booked a foreign holiday, bought goods from an overseas retailer, or paid for a service outside the UK using your UK credit card, Section 75 applies."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if the retailer has gone into administration?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Administration or liquidation is one of the most common Section 75 scenarios, and one of the clearest. The company's inability to fulfil its obligations constitutes a breach of contract. Your credit card provider is jointly liable. You do not need to wait for the administration to conclude before making your claim."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I claim if I paid by credit card through a buy now, pay later scheme?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on the scheme. Some buy now, pay later products are regulated consumer credit agreements and Section 75 applies. Others are not regulated in the same way and fall outside the Act. Check whether your BNPL provider is authorised by the FCA as a consumer credit lender."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I paid via PayPal using my credit card?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Section 75 is less reliable for credit card payments made through PayPal because PayPal is the legal counterparty to the transaction, not the underlying merchant. PayPal has its own buyer protection programme. The Section 75 position for PayPal transactions is genuinely uncertain, and the Financial Ombudsman Service has reached different conclusions in different cases."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Section 75 cover store cards?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It can. If a store card is issued under a regulated consumer credit agreement, Section 75 applies in the same way as for a standard credit card. The purchase price thresholds and other conditions are the same."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I make a Section 75 claim if I have already received a partial refund?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Your claim is for your net loss: the amount you paid minus any amount already refunded to you. If you received a partial refund from the retailer or administrator before making your Section 75 claim, state the amounts clearly in your letter and claim only the outstanding balance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will making a Section 75 claim affect my credit score?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Making a Section 75 claim is a consumer rights process, not a credit application. It does not affect your credit score. There is no mechanism by which a Section 75 claim causes a mark on your credit file."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost to make a Section 75 claim?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nothing. Making a claim directly to your card provider costs nothing. Escalating to the Financial Ombudsman Service costs nothing. You do not need to use a claims management company or a solicitor for a standard Section 75 claim."
+      }
+    }
+  ]
+};
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "datePublished": publishedAt.toISOString().split('T')[0],
+  "dateModified": updatedAt.toISOString().split('T')[0],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Section 75 Claim Helper",
+    "url": "https://section75help.co.uk"
+  }
+};
 ---
 
 <BaseLayout {title} {description} {disclaimer}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  </Fragment>
   <article class="prose prose-gray max-w-none">
     <h1>{title}</h1>
     <Content />
