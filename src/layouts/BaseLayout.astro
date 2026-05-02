@@ -27,37 +27,37 @@ const { title, description, disclaimer = false, noindex = false } = Astro.props;
   <body class="bg-white text-gray-900 antialiased">
 
     <!-- ── Header ────────────────────────────────────────────────────────── -->
-    <header style="background-color: #1e3a5f;">
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <header class="bg-white border-b border-gray-200">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
 
         <a href="/" class="hover:opacity-80 transition-opacity shrink-0">
-          <img src="/logo-icon.webp" alt="Section 75 Help" class="h-9 w-auto sm:hidden" />
-          <img src="/logo-wide.webp" alt="Section 75 Help" class="hidden sm:block h-9 w-auto" />
+          <img src="/logo-icon.webp" alt="Section 75 Help" class="h-10 w-auto sm:hidden" />
+          <img src="/logo-wide.webp" alt="Section 75 Help" class="hidden sm:block h-10 w-auto" />
         </a>
 
         <nav aria-label="Primary">
           <ul class="flex items-center gap-3 sm:gap-5">
             <li>
-              <a href="/guide/" class="text-sm text-white/80 hover:text-white transition-colors">
+              <a href="/guide/" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                 <span class="sm:hidden">Guide</span>
                 <span class="hidden sm:inline">How It Works</span>
               </a>
             </li>
             <li class="hidden sm:block">
-              <a href="/#situations" class="text-sm text-white/80 hover:text-white transition-colors">
+              <a href="/#situations" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                 Situations
               </a>
             </li>
             <li class="hidden sm:block">
-              <a href="/#checker" class="text-sm text-white/80 hover:text-white transition-colors">
+              <a href="/#checker" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                 Check Eligibility
               </a>
             </li>
             <li>
               <a
                 href="/claim-pack/"
-                class="rounded bg-white px-3 py-1.5 text-xs sm:text-sm font-semibold transition-colors hover:bg-gray-100 whitespace-nowrap"
-                style="color: #1e3a5f;"
+                class="rounded px-3 py-1.5 text-xs sm:text-sm font-semibold text-white transition-colors hover:opacity-90 whitespace-nowrap"
+                style="background-color: #1e3a5f;"
               >
                 Claim Pack — £6.99
               </a>
