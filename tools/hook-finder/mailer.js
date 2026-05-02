@@ -107,7 +107,7 @@ function generateEmailHtml({ scored, date, totalFetched, runUrl }) {
 
   if (rejected.length > 0) {
     sections.push(`
-      <p style="margin:16px 0 0;color:#6b7280;font-size:13px">${rejected.length} company${s(rejected.length)} scored below threshold (likely B2B or insufficient evidence) — not shown.</p>
+      <p style="margin:16px 0 0;color:#6b7280;font-size:13px">${rejected.length} ${rejected.length !== 1 ? "companies" : "company"} scored below threshold (likely B2B or insufficient evidence) — not shown.</p>
     `);
   }
 
