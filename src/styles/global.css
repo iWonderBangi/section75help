@@ -9,6 +9,28 @@
   --link-hover: #1d4ed8;
 }
 
+/* ── Callout components ───────────────────────────────────────────────────── */
+@layer components {
+  /* tip: navy left border + light blue bg */
+  .callout-tip {
+    border-left: 4px solid var(--navy);
+    background-color: #eff6ff;
+    @apply rounded-lg px-5 py-4 text-sm text-gray-700 my-6;
+  }
+  /* warning: amber left border + light amber bg */
+  .callout-warning {
+    border-left: 4px solid #d97706;
+    background-color: #fffbeb;
+    @apply rounded-lg px-5 py-4 text-sm text-gray-700 my-6;
+  }
+  /* info: grey left border + light grey bg */
+  .callout-info {
+    border-left: 4px solid #6b7280;
+    background-color: #f9fafb;
+    @apply rounded-lg px-5 py-4 text-sm text-gray-700 my-6;
+  }
+}
+
 /* ── Primary button components ────────────────────────────────────────────── */
 @layer components {
   /* Standard button */

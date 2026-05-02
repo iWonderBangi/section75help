@@ -109,6 +109,18 @@ const articleSchema = {
     "url": "https://section75help.co.uk"
   }
 };
+
+const sidebarLinks = [
+  { href: '#what-section-75-actually-says',                                        label: 'What Section 75 says'        },
+  { href: '#who-can-make-a-section-75-claim',                                      label: 'Who can claim'               },
+  { href: '#what-counts-as-a-breach-of-contract',                                  label: 'Grounds for a claim'         },
+  { href: '#the-three-party-structure-when-section-75-does-and-does-not-apply',    label: 'PayPal and intermediaries'   },
+  { href: '#how-to-make-a-section-75-claim-step-by-step',                          label: 'Step-by-step claim'          },
+  { href: '#what-evidence-to-gather',                                               label: 'Evidence to gather'          },
+  { href: '#how-long-a-section-75-claim-takes',                                    label: 'How long it takes'           },
+  { href: '#what-to-do-if-the-bank-rejects-your-claim',                            label: 'If the bank refuses'         },
+  { href: '#frequently-asked-questions',                                            label: 'FAQs'                        },
+];
 ---
 
 <BaseLayout {title} {description} {disclaimer}>
@@ -116,19 +128,86 @@ const articleSchema = {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   </Fragment>
-  <article class="prose prose-gray max-w-none">
-    <h1>{title}</h1>
-    <Content />
-  </article>
-  <p class="mt-8 text-xs text-gray-400">
-    Last updated: {updatedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-  </p>
 
-  <div class="mt-10 rounded-lg border p-6" style="border-color: #1e3a5f; background-color: #f0f4f8;">
-    <h2 class="text-base font-semibold text-gray-900 mb-2">Ready to make your claim?</h2>
-    <p class="text-sm text-gray-700 mb-4">
-      The claim pack includes template letters with the correct legal citations, an evidence checklist, and rejection rebuttals for the most common bank responses. One plain-English PDF workbook, £6.99.
-    </p>
-    <a href="/claim-pack/" class="btn-primary">Get the template letters — £6.99</a>
+  <div class="lg:grid lg:grid-cols-[1fr_196px] lg:gap-10 lg:items-start">
+
+    <!-- ── Main content column ──────────────────────────────────────────────── -->
+    <div class="min-w-0">
+      <article class="prose prose-gray max-w-none">
+        <h1>{title}</h1>
+        <Content />
+      </article>
+
+      <p class="mt-8 text-xs text-gray-400">
+        Last updated: {updatedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+      </p>
+
+      <div class="mt-10 rounded-lg border p-6" style="border-color: #1e3a5f; background-color: #f0f4f8;">
+        <h2 class="text-base font-semibold text-gray-900 mb-2">Ready to make your claim?</h2>
+        <p class="text-sm text-gray-700 mb-4">
+          The claim pack includes template letters with the correct legal citations, an evidence checklist, and rejection rebuttals for the most common bank responses. One plain-English PDF workbook, £6.99.
+        </p>
+        <a href="/claim-pack/" class="btn-primary">Get the template letters — £6.99</a>
+      </div>
+    </div>
+
+    <!-- ── Sticky sidebar (desktop only) ────────────────────────────────────── -->
+    <aside class="hidden lg:block" aria-label="Page navigation">
+      <div class="sticky top-8">
+        <nav class="rounded-lg border border-gray-200 bg-gray-50 p-5">
+          <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">In this guide</p>
+          <ul class="space-y-2.5 text-sm">
+            {sidebarLinks.map(({ href, label }) => (
+              <li>
+                <a
+                  href={href}
+                  data-sidebar-link={href.slice(1)}
+                  class="block text-gray-600 hover:text-gray-900 transition-colors leading-snug"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div class="mt-6 pt-5 border-t border-gray-200">
+            <a
+              href="/claim-pack/"
+              class="block text-center rounded py-2.5 text-xs font-bold text-white transition-opacity hover:opacity-90"
+              style="background-color: #1e3a5f;"
+            >
+              Get the claim pack — £6.99
+            </a>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
   </div>
 </BaseLayout>
+
+<script>
+  // Scroll-spy: highlight active section in sidebar nav
+  const sections = Array.from(document.querySelectorAll('article h2[id]')) as HTMLElement[];
+  const navLinks = Array.from(document.querySelectorAll('[data-sidebar-link]')) as HTMLElement[];
+
+  if (sections.length && navLinks.length) {
+    const activate = (id: string) => {
+      navLinks.forEach(link => {
+        const isActive = link.dataset.sidebarLink === id;
+        link.classList.toggle('font-semibold', isActive);
+        link.classList.toggle('text-gray-900', isActive);
+        link.classList.toggle('text-gray-600', !isActive);
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length) activate(visible[0].target.id);
+      },
+      { rootMargin: '-10% 0% -80% 0%', threshold: 0 }
+    );
+
+    sections.forEach(s => observer.observe(s));
+  }
+</script>

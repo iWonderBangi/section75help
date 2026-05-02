@@ -191,13 +191,47 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <h2>What happens after payment</h2>
 
-    <ol>
-      <li>Pay securely through the Stripe checkout.</li>
-      <li>After payment you are taken to a download page. Save the PDF somewhere easy to find — you may need it over the coming weeks.</li>
-      <li>Open the PDF and start at the beginning — the start-here guide and checker will confirm which letter applies to your situation.</li>
-      <li>Fill in the highlighted placeholders in your chosen letter with your own details.</li>
-      <li>Send the completed letter and supporting evidence to your card provider's disputes team.</li>
-    </ol>
+  </article>
+
+  <div class="not-prose my-8">
+    <div class="grid sm:grid-cols-4 gap-px bg-gray-200 rounded-lg overflow-hidden border border-gray-200">
+      {[
+        {
+          n: '1',
+          title: 'Pay securely',
+          desc: 'Complete checkout through Stripe. Takes about two minutes. You will receive a payment receipt by email.'
+        },
+        {
+          n: '2',
+          title: 'Download the PDF',
+          desc: 'You are taken to a download page immediately after payment. Save the file somewhere easy to find.'
+        },
+        {
+          n: '3',
+          title: 'Fill in your details',
+          desc: 'Open the PDF and work through the worksheet. The start-here guide shows which letter applies to your situation.'
+        },
+        {
+          n: '4',
+          title: 'Send to your bank',
+          desc: 'Email or post the completed letter and evidence to your card provider\'s disputes team. Keep copies of everything.'
+        },
+      ].map(({ n, title, desc }) => (
+        <div class="bg-white px-5 py-5">
+          <div
+            class="flex items-center justify-center w-9 h-9 rounded-full text-white text-sm font-bold mb-3"
+            style="background-color: #1e3a5f;"
+          >
+            {n}
+          </div>
+          <p class="font-semibold text-gray-900 text-sm mb-1">{title}</p>
+          <p class="text-xs text-gray-500 leading-relaxed">{desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <article class="prose prose-gray max-w-none">
 
     <h2>Is this legal advice?</h2>
 
