@@ -29,17 +29,17 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
       <h2 class="text-lg font-semibold text-gray-900 mb-1">Where are you in the process?</h2>
       <p class="text-sm text-gray-600 mb-4">Jump straight to the right part of the guide for your stage.</p>
       <div class="grid sm:grid-cols-3 gap-3">
-        <a href="/guide/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+        <a href="/guide/" class="block rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-4 hover:shadow transition-shadow">
           <p class="text-xs font-semibold uppercase tracking-wide mb-1.5" style="color: #1e3a5f;">Stage 1</p>
           <h3 class="font-medium text-gray-900 text-sm mb-1">I've just found out I have a problem</h3>
           <p class="text-xs text-gray-500 leading-relaxed">Check eligibility, gather evidence, and write your first claim letter.</p>
         </a>
-        <a href="/guide/#what-to-do-if-the-bank-rejects-your-claim" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+        <a href="/guide/#what-to-do-if-the-bank-rejects-your-claim" class="block rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-4 hover:shadow transition-shadow">
           <p class="text-xs font-semibold uppercase tracking-wide mb-1.5" style="color: #1e3a5f;">Stage 2</p>
           <h3 class="font-medium text-gray-900 text-sm mb-1">My bank has rejected my claim</h3>
           <p class="text-xs text-gray-500 leading-relaxed">See the most common rejection reasons and the rebuttals that work.</p>
         </a>
-        <a href="/guide/financial-ombudsman/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+        <a href="/guide/financial-ombudsman/" class="block rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-4 hover:shadow transition-shadow">
           <p class="text-xs font-semibold uppercase tracking-wide mb-1.5" style="color: #1e3a5f;">Stage 3</p>
           <h3 class="font-medium text-gray-900 text-sm mb-1">I'm going to the Ombudsman</h3>
           <p class="text-xs text-gray-500 leading-relaxed">What to expect and how to refer your complaint to the Financial Ombudsman Service.</p>
@@ -50,17 +50,17 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
     <section>
       <h2 class="text-lg font-semibold text-gray-900 mb-4">What to do next</h2>
       <div class="grid gap-4 sm:grid-cols-3">
-        <a href="/guide/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 transition-colors">
+        <a href="/guide/" class="block rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-4 hover:shadow transition-shadow">
           <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #1e3a5f;">Step 1</p>
           <h3 class="font-medium text-gray-900 mb-1">Read the guide</h3>
           <p class="text-sm text-gray-600">How Section 75 works, who qualifies, and how to claim step by step.</p>
         </a>
-        <a href="/guide/section-75-vs-chargeback/" class="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 transition-colors">
+        <a href="/guide/section-75-vs-chargeback/" class="block rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-4 hover:shadow transition-shadow">
           <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #1e3a5f;">Step 2</p>
           <h3 class="font-medium text-gray-900 mb-1">Section 75 or chargeback?</h3>
           <p class="text-sm text-gray-600">Which route applies to your situation, and how to tell the difference.</p>
         </a>
-        <a href="/claim-pack/" class="block rounded-lg border p-4 transition-colors hover:opacity-90" style="background-color: #1e3a5f; border-color: #1e3a5f;">
+        <a href="/claim-pack/" class="block rounded-lg p-4 transition-opacity hover:opacity-90 shadow-sm" style="background-color: #1e3a5f;">
           <p class="text-xs font-semibold text-white/60 uppercase tracking-wide mb-1">Step 3</p>
           <h3 class="font-medium text-white mb-1">Write your claim — £6.99</h3>
           <p class="text-sm text-white/70">Template letters, evidence checklists, and rejection rebuttals in one PDF.</p>
@@ -81,7 +81,7 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
           { href: '/category/section-75-gym-membership/',    label: 'Gym membership',        desc: 'Gym closed mid-membership or upfront fee unused' },
           { href: '/category/section-75-building-work/',     label: 'Building work',         desc: 'Builder abandoned the job or work is seriously defective' },
         ].map(({ href, label, desc }) => (
-          <a href={href} class="flex flex-col rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+          <a href={href} class="flex flex-col rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 px-4 py-3 hover:shadow transition-shadow">
             <span class="font-medium text-gray-900 text-sm">{label}</span>
             <span class="text-xs text-gray-500 mt-0.5">{desc}</span>
           </a>
@@ -101,7 +101,7 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
           { href: '/guide/natwest-section-75/',   label: 'NatWest' },
           { href: '/guide/santander-section-75/', label: 'Santander' },
         ].map(({ href, label }) => (
-          <a href={href} class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+          <a href={href} class="flex items-center justify-between rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 px-4 py-3 hover:shadow transition-shadow">
             <span class="font-medium text-gray-900 text-sm">{label}</span>
             <span class="text-xs text-gray-400">Section 75 guide ›</span>
           </a>
@@ -114,7 +114,7 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
       <p class="text-sm text-gray-600">When a UK retailer or service provider goes into administration, we publish a specific Section 75 guide within 48 hours explaining what customers can claim and how. There are no new entries at present — <a href="/guide/" class="underline hover:text-gray-800">read the complete guide</a> for the full process.</p>
     </section>
 
-    <section class="rounded-lg border border-gray-200 bg-gray-50 p-5 text-sm text-gray-600">
+    <section class="rounded-lg bg-white shadow-sm ring-1 ring-gray-200/70 p-5 text-sm text-gray-600">
       <p class="font-semibold text-gray-800 mb-4">What we do and do not do</p>
       <div class="grid sm:grid-cols-2 gap-4">
         <div>

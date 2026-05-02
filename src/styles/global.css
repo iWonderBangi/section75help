@@ -7,7 +7,18 @@
   --navy-hover: #162d49;
   --link:       #2563eb;
   --link-hover: #1d4ed8;
+  --bg-warm:    #f8f7f5;
 }
+
+/* ── Base overrides ───────────────────────────────────────────────────────── */
+
+/* Warm off-white body — more inviting than pure white */
+body { background-color: var(--bg-warm); }
+
+/* Tighter heading tracking — reads as more considered and premium */
+h1 { letter-spacing: -0.025em; }
+h2 { letter-spacing: -0.02em; }
+h3 { letter-spacing: -0.015em; }
 
 /* ── Callout components ───────────────────────────────────────────────────── */
 @layer components {
