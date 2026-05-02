@@ -26,6 +26,7 @@
     "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
+    "@astrojs/sitemap": "^3.7.2",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.18.0",
     "puppeteer": "^24.42.0"
