@@ -15,7 +15,8 @@ const { title, description, disclaimer = false, noindex = false } = Astro.props;
 <html lang="en-GB">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
@@ -29,9 +30,9 @@ const { title, description, disclaimer = false, noindex = false } = Astro.props;
     <header style="background-color: #1e3a5f;">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
 
-        <a href="/" class="font-semibold text-white hover:text-white/80 transition-colors leading-tight">
-          <span class="sm:hidden text-sm">Section 75</span>
-          <span class="hidden sm:inline text-sm">Section 75 Claim Helper</span>
+        <a href="/" class="hover:opacity-80 transition-opacity shrink-0">
+          <img src="/logo-icon.webp" alt="Section 75 Help" class="h-9 w-auto sm:hidden" />
+          <img src="/logo-wide.webp" alt="Section 75 Help" class="hidden sm:block h-9 w-auto" />
         </a>
 
         <nav aria-label="Primary">
