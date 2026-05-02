@@ -1,18 +1,22 @@
 #!/usr/bin/env node
-// Hook Finder — Phase 2A: live-source ingestion prototype.
+// Hook Finder — CLI entry point.
 //
 // Usage:
 //   node tools/hook-finder/run.js                         mock mode (default)
+//   node tools/hook-finder/run.js --rss                   RSS mode — fetches Gazette feed, emails report
 //   node tools/hook-finder/run.js --live                  live mode, reads live-input.json
 //   node tools/hook-finder/run.js --input path/to/file    live mode, reads specified file
 //
-// Mock mode:   uses tools/hook-finder/data/candidates.js, no API calls.
-// Live mode:   reads a JSON input file, enriches each candidate via the
-//              Companies House API and Gazette adapter, then scores and reports.
+// RSS mode:    fetches today's Gazette insolvency notices, looks up each company on
+//              Companies House, scores, and emails the report via Resend.
+//              Requires COMPANIES_HOUSE_API_KEY, RESEND_API_KEY, REPORT_EMAIL_TO.
+//              Continues safely if any of these are missing (with warnings).
 //
-// Live mode requires COMPANIES_HOUSE_API_KEY to be set in your environment.
+// Mock mode:   uses tools/hook-finder/data/candidates.js, no API calls.
+// Live mode:   reads a JSON input file, enriches via source adapters.
+//
 // Output is written to tools/hook-finder/output/ (git-ignored).
-// No content is published. Human review is required before any hook page is drafted.
+// No content is published. Human review is required before any page is drafted.
 
 import { readFileSync, mkdirSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
@@ -25,6 +29,9 @@ import { generateBrief } from "./briefer.js";
 import { enrichCandidates } from "./sources/index.js";
 import { validateCandidates } from "./validate.js";
 import { detectDuplicates } from "./dedup.js";
+import { fetchGazetteNotices, buildCandidateFromNotice } from "./sources/gazette-rss.js";
+import { searchByName } from "./sources/companies-house.js";
+import { sendDailyReport } from "./mailer.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "output");
@@ -34,6 +41,7 @@ function parseArgs(argv) {
   const args = argv.slice(2);
   const options = { mode: "mock", inputFile: null };
   for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--rss") options.mode = "rss";
     if (args[i] === "--live") options.mode = "live";
     if (args[i] === "--mock") options.mode = "mock";
     if (args[i] === "--input" && args[i + 1]) {
@@ -89,14 +97,77 @@ function writeFile(filePath, content) {
 async function run() {
   const options = parseArgs(process.argv);
 
-  console.log("\n=== Hook Finder — Phase 2A ===");
+  console.log("\n=== Hook Finder ===");
   console.log(`Date  : ${today()}`);
   console.log(`Mode  : ${options.mode.toUpperCase()}`);
   console.log("");
 
   let rawCandidates;
+  let totalFetched = 0; // total notices seen before scoring (for email summary)
 
-  if (options.mode === "mock") {
+  if (options.mode === "rss") {
+    // RSS mode: fetch today's Gazette insolvency notices, look up each on Companies House.
+    console.log("Fetching Gazette insolvency feed...");
+    let notices;
+    try {
+      notices = await fetchGazetteNotices({ lookbackHours: 25 });
+    } catch (err) {
+      console.error(`  Error: ${err.message}`);
+      console.error("  Cannot continue in RSS mode without Gazette data.");
+      process.exit(1);
+    }
+    totalFetched = notices.length;
+    console.log(`  ${notices.length} relevant notice(s) found in the last 24 hours.`);
+    console.log("");
+
+    if (notices.length === 0) {
+      console.log("No new insolvency notices found. Sending summary email and exiting.");
+      // Still send the email so you know the system ran.
+      rawCandidates = [];
+    } else {
+      console.log("Looking up companies on Companies House...");
+      const apiKeySet = !!process.env.COMPANIES_HOUSE_API_KEY;
+      if (!apiKeySet) {
+        console.log("  COMPANIES_HOUSE_API_KEY not set — sector classification will use defaults.");
+      }
+
+      rawCandidates = [];
+      for (const notice of notices) {
+        let chResult = null;
+        if (apiKeySet) {
+          try {
+            chResult = await searchByName(notice.companyName);
+          } catch {
+            // continue without CH search result
+          }
+        }
+        const candidate = buildCandidateFromNotice(notice, chResult);
+        if (chResult?.company_number) {
+          process.stdout.write(`  Found: ${notice.companyName.padEnd(35)} → ${chResult.company_number}\n`);
+        } else {
+          process.stdout.write(`  Unmatched: ${notice.companyName}\n`);
+        }
+        rawCandidates.push(candidate);
+      }
+      console.log("");
+
+      // Dedup by company_number and primary_source_url.
+      const { candidates: deduped, log: dedupLog } = detectDuplicates(rawCandidates);
+      if (dedupLog.length > 0) {
+        dedupLog.forEach(({ action, reason, name }) =>
+          console.log(`  [${action.toUpperCase()}] ${name}: ${reason}`)
+        );
+      }
+      rawCandidates = deduped;
+
+      // Enrich via Companies House (company + insolvency endpoints).
+      if (apiKeySet && rawCandidates.some((c) => c.company_number)) {
+        console.log("Enriching via Companies House...");
+        rawCandidates = await enrichCandidates(rawCandidates, { skipGazette: true });
+        console.log("");
+      }
+    }
+  } else if (options.mode === "mock") {
     rawCandidates = mockCandidates;
     console.log(`Candidates : ${rawCandidates.length} (mock data — no API calls)`);
     console.log("");
@@ -157,8 +228,8 @@ async function run() {
 
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  // Live reports get a -live suffix so they never overwrite mock reports.
-  const modeSuffix = options.mode === "live" ? "-live" : "";
+  // Each mode gets its own suffix so reports never overwrite each other.
+  const modeSuffix = options.mode === "mock" ? "" : `-${options.mode}`;
   const reportPath = join(OUTPUT_DIR, `report-${today()}${modeSuffix}.md`);
   const report = generateReport(scored, today(), options.mode);
   writeFile(reportPath, report);
@@ -189,6 +260,27 @@ async function run() {
       const briefPath = join(OUTPUT_DIR, `brief-${slug(name)}${modeSuffix}.md`);
       const brief = generateBrief(candidate);
       writeFile(briefPath, brief);
+    }
+  }
+
+  // Send email report in RSS mode.
+  if (options.mode === "rss") {
+    const runUrl =
+      process.env.GITHUB_RUN_ID && process.env.GITHUB_REPOSITORY
+        ? `${process.env.GITHUB_SERVER_URL ?? "https://github.com"}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+        : null;
+
+    console.log("\nSending email report...");
+    const mailResult = await sendDailyReport({
+      scored,
+      date: today(),
+      totalFetched,
+      runUrl,
+    });
+    if (mailResult.sent) {
+      console.log("  Email sent.");
+    } else {
+      console.warn(`  Email skipped: ${mailResult.warning}`);
     }
   }
 

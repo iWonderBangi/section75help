@@ -3,9 +3,23 @@ name: Hook Finder
 # Runs daily at 07:00 UTC (07:00 GMT in winter / 08:00 BST in summer).
 # Also triggerable manually via workflow_dispatch.
 #
-# Output: a Markdown report uploaded as a workflow artifact for human review.
-# This workflow does NOT publish pages, create issues, or modify the public site.
-# All output requires human review before any action is taken.
+# What this does:
+#   1. Fetches today's Gazette insolvency notices.
+#   2. Looks up each company on Companies House for sector/SIC data.
+#   3. Scores each company for Section 75 SEO opportunity.
+#   4. Emails a morning report to REPORT_EMAIL_TO.
+#   5. Uploads the full report as a workflow artifact (30-day retention).
+#
+# Required secrets:
+#   COMPANIES_HOUSE_API_KEY — free at developer.company-information.service.gov.uk
+#   RESEND_API_KEY          — free at resend.com
+#   REPORT_EMAIL_TO         — your inbox address
+#
+# Optional secrets:
+#   REPORT_EMAIL_FROM       — sender address (verified Resend domain).
+#                             Omit to use the shared test sender (fine for personal use).
+#
+# This workflow does NOT publish pages or modify the public site.
 
 on:
   workflow_dispatch:
@@ -21,7 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
 
     steps:
       - name: Checkout
@@ -35,11 +48,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Hook Finder (CI mode)
+      - name: Run Hook Finder (RSS mode)
         id: hook_finder
-        run: npm run hook-finder:ci
+        run: npm run hook-finder:rss
         env:
           COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
+          REPORT_EMAIL_FROM: ${{ secrets.REPORT_EMAIL_FROM }}
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -48,9 +64,3 @@ jobs:
           name: hook-finder-report-${{ github.run_id }}
           path: tools/hook-finder/output/
           retention-days: 30
-
-      - name: Create GitHub Issue for needs_review candidates
-        if: steps.hook_finder.outcome == 'success'
-        run: node tools/hook-finder/create-issue.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

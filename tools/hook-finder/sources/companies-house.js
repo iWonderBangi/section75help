@@ -103,6 +103,47 @@ function mapInsolvencyType(caseType) {
   return INSOLVENCY_TYPE_MAP[caseType] ?? caseType ?? "unknown";
 }
 
+// Search Companies House by company name.
+// Used in RSS mode to find a company number from a Gazette notice title.
+// Returns { company_number, company_name, sic_codes } or null.
+// Returns null (does not throw) if the key is missing or the search fails.
+export async function searchByName(name) {
+  const apiKey = process.env.COMPANIES_HOUSE_API_KEY;
+  if (!apiKey) return null;
+
+  const q = encodeURIComponent(name);
+  let result;
+  try {
+    result = await chFetch(`/search/companies?q=${q}&items_per_page=5`, apiKey);
+  } catch {
+    return null;
+  }
+
+  if (!result || !Array.isArray(result.items) || result.items.length === 0) {
+    return null;
+  }
+
+  // Prefer an exact normalised name match; fall back to the top result.
+  const normalised = normaliseName(name);
+  const match =
+    result.items.find((item) => normaliseName(item.title ?? "") === normalised) ??
+    result.items[0];
+
+  return {
+    company_number: match.company_number,
+    company_name: match.title,
+    sic_codes: match.sic_codes ?? [],
+  };
+}
+
+function normaliseName(name) {
+  return name
+    .toLowerCase()
+    .replace(/\b(limited|ltd|plc|llp|lp|inc|corp|corporation)\b/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 // Enrich a candidate with Companies House data.
 // Returns { enriched: boolean, warning: string|null, updates: object }
 // where `updates` is a partial candidate object to be merged by the caller.

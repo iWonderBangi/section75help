@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "hook-finder": "node tools/hook-finder/run.js",
+    "hook-finder:rss": "node tools/hook-finder/run.js --rss",
     "hook-finder:live": "node tools/hook-finder/run.js --live",
     "hook-finder:ci": "node tools/hook-finder/run.js --input tools/hook-finder/data/live-input.example.json",
     "hook-finder:draft": "node tools/hook-finder/create-page-draft.js",
