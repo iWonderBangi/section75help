@@ -6,9 +6,14 @@ interface Props {
   description: string;
   disclaimer?: boolean;
   noindex?: boolean;
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, disclaimer = false, noindex = false } = Astro.props;
+const { title, description, disclaimer = false, noindex = false, ogType = 'website' } = Astro.props;
+
+const siteBase = Astro.site ?? new URL('https://section75help.co.uk');
+const canonicalURL = new URL(Astro.url.pathname, siteBase).href;
+const ogImageURL  = new URL('/logo-wide.webp', siteBase).href;
 ---
 
 <!doctype html>
@@ -23,6 +28,23 @@ const { title, description, disclaimer = false, noindex = false } = Astro.props;
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="google-site-verification" content="8GdfPa_WzGLg0THPF8LuPyL_fbtO6PY0sAZ3Bpc36Xk" />
     <title>{title} | Section 75 Claim Helper</title>
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content={ogType} />
+    <meta property="og:site_name"   content="Section 75 Claim Helper" />
+    <meta property="og:title"       content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url"         content={canonicalURL} />
+    <meta property="og:image"       content={ogImageURL} />
+    <meta property="og:locale"      content="en_GB" />
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"       content={ogImageURL} />
+
     <slot name="head" />
   </head>
   <body class="bg-[#f8f7f5] text-gray-900 antialiased">
