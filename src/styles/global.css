@@ -42,6 +42,19 @@
 }
 .prose :where(a):hover { color: var(--link-hover); }
 
+/* Prevent prose link colour overriding button text */
+a.btn-primary,
+a.btn-primary-lg,
+a.btn-primary-full {
+  color: white;
+  text-decoration: none;
+}
+a.btn-primary:hover,
+a.btn-primary-lg:hover,
+a.btn-primary-full:hover {
+  color: white;
+}
+
 /* Horizontally scrollable tables on narrow screens */
 .prose :where(table) {
   display: block;
