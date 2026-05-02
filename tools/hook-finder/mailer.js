@@ -83,11 +83,12 @@ function generateEmailHtml({ scored, date, gazetteCount, newsCount, runUrl }) {
   const signalSummary = newsCount > 0
     ? `${gazetteCount} Gazette notice${s(gazetteCount)} + ${newsCount} news alert${s(newsCount)}`
     : `${gazetteCount} Gazette notice${s(gazetteCount)}`;
+  const windowLabel = newsCount > 0 ? "last 48 hours" : "last 24 hours";
 
   const intro =
     needsReview.length + monitoring.length > 0
-      ? `${signalSummary} in the last 48 hours. ${needsReview.length + monitoring.length} appear consumer-facing.`
-      : `${signalSummary} in the last 48 hours — none appear consumer-facing.`;
+      ? `${signalSummary} in the ${windowLabel}. ${needsReview.length + monitoring.length} appear consumer-facing.`
+      : `${signalSummary} in the ${windowLabel} — none appear consumer-facing.`;
 
   const artifactLine = runUrl
     ? `<p style="margin:0 0 16px"><a href="${escHtml(runUrl)}" style="color:#0070f3">View full report and briefs in GitHub Actions</a></p>`
@@ -203,10 +204,11 @@ function generateEmailText({ scored, date, gazetteCount, newsCount, runUrl }) {
   const signalSummary = newsCount > 0
     ? `${gazetteCount} Gazette notice${s(gazetteCount)} + ${newsCount} news alert${s(newsCount)}`
     : `${gazetteCount} Gazette notice${s(gazetteCount)}`;
+  const windowLabel = newsCount > 0 ? "last 48 hours" : "last 24 hours";
 
   const lines = [];
   lines.push(`Hook Finder — ${date}`);
-  lines.push(`${signalSummary} in the last 48 hours.`);
+  lines.push(`${signalSummary} in the ${windowLabel}.`);
   lines.push("");
 
   if (needsReview.length > 0) {
