@@ -149,7 +149,7 @@
     stepsContainer.querySelectorAll('[data-step]').forEach(el => {
       (el as HTMLElement).classList.add('hidden');
     });
-    const target = stepsContainer.querySelector(`[data-step="${key}"]`);
+    const target = stepsContainer.querySelector(`[data-step="${CSS.escape(key)}"]`);
     if (target) target.classList.remove('hidden');
 
     // Update dots

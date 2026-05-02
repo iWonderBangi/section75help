@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /claim-pack/thank-you/
+
+Sitemap: https://section75help.co.uk/sitemap-index.xml

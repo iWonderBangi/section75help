@@ -1,0 +1,12 @@
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://formspree.io; frame-src https://buy.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io https://buy.stripe.com; upgrade-insecure-requests
+
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private
+  X-Content-Type-Options: nosniff
