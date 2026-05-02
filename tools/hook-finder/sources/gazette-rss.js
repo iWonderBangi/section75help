@@ -9,27 +9,27 @@
 
 const GAZETTE_FEED_URL = "https://www.thegazette.co.uk/insolvency/data.feed";
 
-// Atom category terms for initial insolvency appointments only.
-// Progress reports, proposals, notices-to-creditors, and petitions are excluded.
+// Gazette category terms for initial insolvency appointments only.
+// These are the exact human-readable strings the feed uses in <category term="...">.
+// Progress reports, proposals, and petitions are excluded.
+// Bankruptcy Orders are excluded — they refer to individuals, not companies.
 const APPOINTMENT_TERMS = new Set([
-  "appointment-of-administrator",
-  "appointment-of-administrative-receiver",
-  "appointment-of-liquidator",
-  "appointment-of-receiver",
-  "creditors-voluntary-liquidation",
-  "members-voluntary-liquidation",
-  "winding-up-order",
+  "Appointment of Administrators",
+  "Appointment of Administrative Receivers",
+  "Appointment of Liquidators",
+  "Appointment of Receivers",
+  "Resolutions for Winding-up",
+  "Winding-Up Orders",
 ]);
 
 // Map Gazette category terms to our insolvency_type values.
 const TERM_TO_INSOLVENCY_TYPE = {
-  "appointment-of-administrator": "administration",
-  "appointment-of-administrative-receiver": "administrative-receivership",
-  "appointment-of-liquidator": "liquidation",
-  "appointment-of-receiver": "receivership",
-  "creditors-voluntary-liquidation": "creditors-voluntary-liquidation",
-  "members-voluntary-liquidation": "members-voluntary-liquidation",
-  "winding-up-order": "compulsory-liquidation",
+  "Appointment of Administrators": "administration",
+  "Appointment of Administrative Receivers": "administrative-receivership",
+  "Appointment of Liquidators": "liquidation",
+  "Appointment of Receivers": "receivership",
+  "Resolutions for Winding-up": "creditors-voluntary-liquidation",
+  "Winding-Up Orders": "compulsory-liquidation",
 };
 
 // SIC code prefix → sector + initial B2C/loss scores.
