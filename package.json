@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@astrojs/sitemap": "^3.7.2",
+    "@cloudflare/workers-types": "^4.20260502.1",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.18.0",
     "puppeteer": "^24.42.0"

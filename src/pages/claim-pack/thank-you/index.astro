@@ -15,14 +15,29 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     </p>
 
     <div class="not-prose my-8">
-      <a
-        href="/downloads/section-75-claim-pack.pdf"
-        download
-        class="btn-primary"
-      >
-        Download the claim pack (PDF)
+      <a id="download-btn" href="#" class="btn-primary" aria-disabled="true">
+        Preparing your download…
       </a>
+      <p id="download-error" class="hidden mt-3 text-sm text-red-700">
+        We could not verify your payment session. If you have just completed payment, please <a href="/contact/" class="underline">contact us</a> with your payment receipt and we will send the file directly.
+      </p>
     </div>
+
+    <script>
+      const btn = document.getElementById('download-btn') as HTMLAnchorElement;
+      const err = document.getElementById('download-error') as HTMLParagraphElement;
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+
+      if (sessionId && sessionId.startsWith('cs_')) {
+        btn.href = `/api/download?session_id=${encodeURIComponent(sessionId)}`;
+        btn.textContent = 'Download the claim pack (PDF)';
+        btn.removeAttribute('aria-disabled');
+      } else {
+        btn.classList.add('hidden');
+        err.classList.remove('hidden');
+      }
+    </script>
 
     <h2>What is in the workbook</h2>
 
