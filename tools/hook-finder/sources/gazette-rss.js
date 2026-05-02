@@ -88,31 +88,56 @@ const SIC_MAP = [
 
 // ─── Feed fetching ────────────────────────────────────────────────────────────
 
+// The Gazette feed returns 10 entries per page. Throughout the day new notices
+// are published and push older ones onto page 2, 3, etc. We follow rel="next"
+// links until every entry on a page predates the lookback window, or until we
+// hit MAX_PAGES (safety cap — 25 pages covers ~250 notices, several days' worth).
+const MAX_PAGES = 25;
+
 export async function fetchGazetteNotices({ lookbackHours = 25 } = {}) {
-  let xml;
-  try {
-    const res = await fetch(GAZETTE_FEED_URL, {
-      headers: { Accept: "application/atom+xml, application/xml, text/xml, */*" },
-    });
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} from Gazette feed`);
-    }
-    xml = await res.text();
-  } catch (err) {
-    throw new Error(`Could not fetch Gazette insolvency feed: ${err.message}`);
-  }
-
-  if (!xml.includes("<entry>") && !xml.includes("<entry ")) {
-    throw new Error(
-      "Gazette feed returned unexpected content — no <entry> elements found. " +
-        "The feed URL may have changed or the service may be temporarily unavailable."
-    );
-  }
-
-  const entries = parseAtomFeed(xml);
   const cutoff = Date.now() - lookbackHours * 60 * 60 * 1000;
+  const allEntries = [];
+  let nextUrl = GAZETTE_FEED_URL;
+  let pagesFetched = 0;
 
-  return entries.filter((e) => {
+  while (nextUrl && pagesFetched < MAX_PAGES) {
+    let xml;
+    try {
+      const res = await fetch(nextUrl, {
+        headers: { Accept: "application/atom+xml, application/xml, text/xml, */*" },
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} from Gazette feed`);
+      }
+      xml = await res.text();
+    } catch (err) {
+      throw new Error(`Could not fetch Gazette insolvency feed: ${err.message}`);
+    }
+
+    if (pagesFetched === 0 && !xml.includes("<entry>") && !xml.includes("<entry ")) {
+      throw new Error(
+        "Gazette feed returned unexpected content — no <entry> elements found. " +
+          "The feed URL may have changed or the service may be temporarily unavailable."
+      );
+    }
+
+    const entries = parseAtomFeed(xml);
+    pagesFetched++;
+
+    // All entries on this page are older than the window — stop paginating.
+    const anyWithinWindow = entries.some(
+      (e) => !e.publishedAt || new Date(e.publishedAt).getTime() >= cutoff
+    );
+    if (!anyWithinWindow && entries.length > 0) break;
+
+    allEntries.push(...entries);
+
+    // Follow rel="next" link if present.
+    const nextMatch = /<link[^>]+rel="next"[^>]+href="([^"]+)"/.exec(xml);
+    nextUrl = nextMatch ? nextMatch[1] : null;
+  }
+
+  return allEntries.filter((e) => {
     if (!APPOINTMENT_TERMS.has(e.term)) return false;
     if (e.publishedAt && new Date(e.publishedAt).getTime() < cutoff) return false;
     return true;
