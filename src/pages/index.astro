@@ -68,6 +68,26 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
     </section>
 
     <section>
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">Find your bank</h2>
+      <p class="text-sm text-gray-600 mb-4">Each page covers how to contact the right team, what evidence to include, and how to respond to common rejection reasons specific to that bank.</p>
+      <div class="grid sm:grid-cols-3 gap-3">
+        {[
+          { href: '/guide/barclays-section-75/',  label: 'Barclaycard' },
+          { href: '/guide/lloyds-section-75/',    label: 'Lloyds Bank' },
+          { href: '/guide/halifax-section-75/',   label: 'Halifax' },
+          { href: '/guide/hsbc-section-75/',      label: 'HSBC' },
+          { href: '/guide/natwest-section-75/',   label: 'NatWest' },
+          { href: '/guide/santander-section-75/', label: 'Santander' },
+        ].map(({ href, label }) => (
+          <a href={href} class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+            <span class="font-medium text-gray-900 text-sm">{label}</span>
+            <span class="text-xs text-gray-400">Section 75 guide ›</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section>
       <h2 class="text-lg font-semibold text-gray-900 mb-2">Recent business failures</h2>
       <p class="text-sm text-gray-600">When a UK retailer or service provider goes into administration, we publish a specific Section 75 guide within 48 hours explaining what customers can claim and how. There are no new entries at present — <a href="/guide/" class="underline hover:text-gray-800">read the complete guide</a> for the full process.</p>
     </section>
