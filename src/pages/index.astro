@@ -46,9 +46,30 @@ import EligibilityChecker from '../components/EligibilityChecker.astro';
       </div>
     </section>
 
+    <section id="situations">
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">Browse by situation</h2>
+      <p class="text-sm text-gray-600 mb-4">Not sure where to start? Find your situation below — each page covers the specific evidence to gather, what your bank is likely to say, and how to respond.</p>
+      <div class="grid sm:grid-cols-2 gap-3">
+        {[
+          { href: '/category/section-75-holiday-booking/',   label: 'Holiday booking',      desc: 'Travel company collapsed or cancelled without refunding' },
+          { href: '/category/section-75-wedding-deposit/',   label: 'Wedding deposit',       desc: 'Venue, caterer, photographer, or other supplier failed' },
+          { href: '/category/section-75-kitchen-deposit/',   label: 'Kitchen installation',  desc: 'Company went bust or failed to complete the fit' },
+          { href: '/category/section-75-car-deposit/',       label: 'Car deposit',           desc: 'Dealer collapsed before delivery or car was misrepresented' },
+          { href: '/category/section-75-furniture-deposit/', label: 'Furniture order',       desc: 'Retailer went into administration or goods not delivered' },
+          { href: '/category/section-75-gym-membership/',    label: 'Gym membership',        desc: 'Gym closed mid-membership or upfront fee unused' },
+          { href: '/category/section-75-building-work/',     label: 'Building work',         desc: 'Builder abandoned the job or work is seriously defective' },
+        ].map(({ href, label, desc }) => (
+          <a href={href} class="flex flex-col rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+            <span class="font-medium text-gray-900 text-sm">{label}</span>
+            <span class="text-xs text-gray-500 mt-0.5">{desc}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
     <section>
       <h2 class="text-lg font-semibold text-gray-900 mb-2">Recent business failures</h2>
-      <p class="text-sm text-gray-600">When a UK retailer or service provider goes into administration, we publish a specific Section 75 guide within 48 hours explaining what customers can claim and how. Check back here if a company you dealt with has recently closed.</p>
+      <p class="text-sm text-gray-600">When a UK retailer or service provider goes into administration, we publish a specific Section 75 guide within 48 hours explaining what customers can claim and how. There are no new entries at present — <a href="/guide/" class="underline hover:text-gray-800">read the complete guide</a> for the full process.</p>
     </section>
 
     <section class="rounded-lg border border-gray-200 bg-gray-50 p-5 text-sm text-gray-600">
