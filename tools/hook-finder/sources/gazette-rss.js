@@ -269,6 +269,8 @@ export function buildCandidateFromNotice(notice, chSearchResult) {
     : "insolvency";
   const dateStr = notice.publishedAt ? notice.publishedAt.slice(0, 10) : "unknown date";
 
+  const isNewsAlert = notice.term === "news-alert";
+
   return {
     company_name: companyName,
     trading_name: null,
@@ -279,9 +281,8 @@ export function buildCandidateFromNotice(notice, chSearchResult) {
     primary_source_url: notice.noticeUrl,
     company_status: "unknown",
 
-    // Source confidence starts at 8 — Gazette is an official primary source.
-    // Companies House enrichment will add further via _confidence_delta.
-    source_confidence_score: 8,
+    // Gazette = 8 (official primary source). News alert = 6 (unconfirmed report).
+    source_confidence_score: isNewsAlert ? 6 : 8,
     b2c_fit_score,
     consumer_loss_score,
     search_demand_score: 8,
@@ -289,11 +290,19 @@ export function buildCandidateFromNotice(notice, chSearchResult) {
 
     verified_facts: [],
     api_confirmed_facts: [],
-    unverified_signals: [
-      `${companyName} entered ${insolvencyLabel} — notice published in the Gazette on ${dateStr}.`,
-    ],
-    editorial_cautions: [
-      "Auto-discovered from Gazette RSS feed — verify all details against the official notice before drafting.",
-    ],
+    unverified_signals: isNewsAlert
+      ? [
+          `${companyName} reported entering ${insolvencyLabel} — sourced from ${notice.sourceName ?? "news"} on ${dateStr}. Not yet confirmed by Gazette.`,
+        ]
+      : [
+          `${companyName} entered ${insolvencyLabel} — notice published in the Gazette on ${dateStr}.`,
+        ],
+    editorial_cautions: isNewsAlert
+      ? [
+          `Auto-discovered from ${notice.sourceName ?? "news RSS"} — not yet confirmed by an official Gazette notice. Verify before drafting any content.`,
+        ]
+      : [
+          "Auto-discovered from Gazette RSS feed — verify all details against the official notice before drafting.",
+        ],
   };
 }

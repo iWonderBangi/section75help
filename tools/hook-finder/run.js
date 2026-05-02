@@ -30,6 +30,7 @@ import { enrichCandidates } from "./sources/index.js";
 import { validateCandidates } from "./validate.js";
 import { detectDuplicates } from "./dedup.js";
 import { fetchGazetteNotices, buildCandidateFromNotice } from "./sources/gazette-rss.js";
+import { fetchNewsAlerts } from "./sources/news-rss.js";
 import { searchByName } from "./sources/companies-house.js";
 import { sendDailyReport } from "./mailer.js";
 
@@ -103,26 +104,39 @@ async function run() {
   console.log("");
 
   let rawCandidates;
-  let totalFetched = 0; // total notices seen before scoring (for email summary)
+  let gazetteCount = 0;
+  let newsCount = 0;
 
   if (options.mode === "rss") {
-    // RSS mode: fetch today's Gazette insolvency notices, look up each on Companies House.
+    // ── Gazette feed ──────────────────────────────────────────────────────────
     console.log("Fetching Gazette insolvency feed...");
-    let notices;
+    let gazetteNotices = [];
     try {
-      notices = await fetchGazetteNotices({ lookbackHours: 25 });
+      gazetteNotices = await fetchGazetteNotices({ lookbackHours: 25 });
     } catch (err) {
       console.error(`  Error: ${err.message}`);
-      console.error("  Cannot continue in RSS mode without Gazette data.");
-      process.exit(1);
+      console.error("  Continuing without Gazette data.");
     }
-    totalFetched = notices.length;
-    console.log(`  ${notices.length} relevant notice(s) found in the last 24 hours.`);
+    gazetteCount = gazetteNotices.length;
+    console.log(`  ${gazetteNotices.length} relevant notice(s) in the last 24 hours.`);
     console.log("");
 
-    if (notices.length === 0) {
-      console.log("No new insolvency notices found. Sending summary email and exiting.");
-      // Still send the email so you know the system ran.
+    // ── News feeds ────────────────────────────────────────────────────────────
+    console.log("Fetching news alerts (BBC, Guardian, Sky News)...");
+    let newsAlerts = [];
+    try {
+      newsAlerts = await fetchNewsAlerts({ lookbackHours: 48 });
+    } catch (err) {
+      console.warn(`  Warning: ${err.message}`);
+    }
+    newsCount = newsAlerts.length;
+    if (newsCount === 0) console.log("  No matching news alerts.");
+    console.log("");
+
+    const allNotices = [...gazetteNotices, ...newsAlerts];
+
+    if (allNotices.length === 0) {
+      console.log("No insolvency signals found. Sending summary email.");
       rawCandidates = [];
     } else {
       console.log("Looking up companies on Companies House...");
@@ -132,7 +146,7 @@ async function run() {
       }
 
       rawCandidates = [];
-      for (const notice of notices) {
+      for (const notice of allNotices) {
         let chResult = null;
         if (apiKeySet) {
           try {
@@ -142,10 +156,11 @@ async function run() {
           }
         }
         const candidate = buildCandidateFromNotice(notice, chResult);
+        const source = notice.term === "news-alert" ? `[${notice.sourceName}]` : "[Gazette]";
         if (chResult?.company_number) {
-          process.stdout.write(`  Found: ${notice.companyName.padEnd(35)} → ${chResult.company_number}\n`);
+          process.stdout.write(`  Found: ${notice.companyName.padEnd(35)} → ${chResult.company_number} ${source}\n`);
         } else {
-          process.stdout.write(`  Unmatched: ${notice.companyName}\n`);
+          process.stdout.write(`  Unmatched: ${notice.companyName} ${source}\n`);
         }
         rawCandidates.push(candidate);
       }
@@ -274,7 +289,8 @@ async function run() {
     const mailResult = await sendDailyReport({
       scored,
       date: today(),
-      totalFetched,
+      gazetteCount,
+      newsCount,
       runUrl,
     });
     if (mailResult.sent) {

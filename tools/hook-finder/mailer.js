@@ -17,7 +17,7 @@
 
 const RESEND_API = "https://api.resend.com/emails";
 
-export async function sendDailyReport({ scored, date, totalFetched, runUrl }) {
+export async function sendDailyReport({ scored, date, gazetteCount = 0, newsCount = 0, runUrl }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     return { sent: false, warning: "RESEND_API_KEY is not set — email skipped." };
@@ -43,8 +43,8 @@ export async function sendDailyReport({ scored, date, totalFetched, runUrl }) {
       ? `Hook Finder — ${actionable.length} notice${actionable.length !== 1 ? "s" : ""} worth reviewing — ${date}`
       : `Hook Finder — nothing consumer-facing today — ${date}`;
 
-  const html = generateEmailHtml({ scored, date, totalFetched, runUrl });
-  const text = generateEmailText({ scored, date, totalFetched, runUrl });
+  const html = generateEmailHtml({ scored, date, gazetteCount, newsCount, runUrl });
+  const text = generateEmailText({ scored, date, gazetteCount, newsCount, runUrl });
 
   let res;
   try {
@@ -73,17 +73,21 @@ export async function sendDailyReport({ scored, date, totalFetched, runUrl }) {
 
 // ─── HTML email ───────────────────────────────────────────────────────────────
 
-function generateEmailHtml({ scored, date, totalFetched, runUrl }) {
+function generateEmailHtml({ scored, date, gazetteCount, newsCount, runUrl }) {
   const needsReview = scored.filter((c) => c.status === "needs_review");
   const monitoring = scored.filter((c) => c.status === "monitoring");
   const rejected = scored.filter((c) => c.status === "rejected");
 
   const s = (n) => (n !== 1 ? "s" : "");
 
+  const signalSummary = newsCount > 0
+    ? `${gazetteCount} Gazette notice${s(gazetteCount)} + ${newsCount} news alert${s(newsCount)}`
+    : `${gazetteCount} Gazette notice${s(gazetteCount)}`;
+
   const intro =
     needsReview.length + monitoring.length > 0
-      ? `${totalFetched} insolvency notice${s(totalFetched)} in the last 24 hours. ${needsReview.length + monitoring.length} appear consumer-facing.`
-      : `${totalFetched} insolvency notice${s(totalFetched)} in the last 24 hours — none appear consumer-facing.`;
+      ? `${signalSummary} in the last 48 hours. ${needsReview.length + monitoring.length} appear consumer-facing.`
+      : `${signalSummary} in the last 48 hours — none appear consumer-facing.`;
 
   const artifactLine = runUrl
     ? `<p style="margin:0 0 16px"><a href="${escHtml(runUrl)}" style="color:#0070f3">View full report and briefs in GitHub Actions</a></p>`
@@ -150,7 +154,7 @@ function candidateRow(c, bgColor, textColor) {
   const sourceUrl = c.primary_source_url;
 
   const sourceLink = sourceUrl
-    ? `<a href="${escHtml(sourceUrl)}" style="color:#0070f3;font-size:13px">Gazette notice</a>`
+    ? `<a href="${escHtml(sourceUrl)}" style="color:#0070f3;font-size:13px">${escHtml(sourceLinkLabel(sourceUrl))}</a>`
     : `<span style="color:#9ca3af;font-size:13px">No source URL</span>`;
 
   const ambigu = c.ambiguous_company
@@ -167,6 +171,19 @@ function candidateRow(c, bgColor, textColor) {
     </div>`;
 }
 
+function sourceLinkLabel(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (host.includes("thegazette.co.uk")) return "Gazette notice";
+    if (host.includes("bbc.co.uk") || host.includes("bbc.com")) return "BBC Business";
+    if (host.includes("theguardian.com")) return "Guardian";
+    if (host.includes("skynews.com")) return "Sky News";
+    return host;
+  } catch {
+    return "Source";
+  }
+}
+
 function escHtml(str) {
   return String(str ?? "")
     .replace(/&/g, "&amp;")
@@ -177,14 +194,19 @@ function escHtml(str) {
 
 // ─── Plain text fallback ──────────────────────────────────────────────────────
 
-function generateEmailText({ scored, date, totalFetched, runUrl }) {
+function generateEmailText({ scored, date, gazetteCount, newsCount, runUrl }) {
   const needsReview = scored.filter((c) => c.status === "needs_review");
   const monitoring = scored.filter((c) => c.status === "monitoring");
   const rejected = scored.filter((c) => c.status === "rejected");
 
+  const s = (n) => (n !== 1 ? "s" : "");
+  const signalSummary = newsCount > 0
+    ? `${gazetteCount} Gazette notice${s(gazetteCount)} + ${newsCount} news alert${s(newsCount)}`
+    : `${gazetteCount} Gazette notice${s(gazetteCount)}`;
+
   const lines = [];
   lines.push(`Hook Finder — ${date}`);
-  lines.push(`${totalFetched} Gazette insolvency notice(s) in the last 24 hours.`);
+  lines.push(`${signalSummary} in the last 48 hours.`);
   lines.push("");
 
   if (needsReview.length > 0) {
@@ -206,7 +228,7 @@ function generateEmailText({ scored, date, totalFetched, runUrl }) {
   }
 
   if (rejected.length > 0) {
-    lines.push(`${rejected.length} company/companies scored below threshold (likely B2B) — not shown.`);
+    lines.push(`${rejected.length} ${rejected.length !== 1 ? "companies" : "company"} scored below threshold (likely B2B) — not shown.`);
     lines.push("");
   }
 
