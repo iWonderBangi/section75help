@@ -1,6 +1,6 @@
 name: Hook Finder
 
-# Runs daily at 07:00 UTC (07:00 GMT in winter / 08:00 BST in summer).
+# Runs daily at 05:00 UTC (05:00 GMT in winter / 06:00 BST in summer).
 # Also triggerable manually via workflow_dispatch.
 #
 # What this does:
@@ -24,7 +24,7 @@ name: Hook Finder
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 5 * * *'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
